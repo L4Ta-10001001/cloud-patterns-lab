@@ -31,6 +31,10 @@ Nota de red: el tráfico SSH sale con IP `181.199.46.145/32` y el HTTP con
 El puerto 8080 de la VM se publica en el host Arch como `127.0.0.1:8088`
 mediante NAT de QEMU para no interferir con el laboratorio 04.
 
+Limpieza: tras guardar las evidencias se ejecutó `terraform destroy` únicamente
+sobre el estado del laboratorio 07 (`8 destroyed`). La instancia EC2 quedó en
+estado `terminated`. Los laboratorios 04 y 05 no fueron afectados.
+
 ## Conclusión
 
 Si las pruebas anteriores son exitosas, se demuestra una migración simplificada de la aplicación a AWS sin rediseñar su lógica. Se aclara que la práctica migra archivos de una carga de trabajo y no realiza la replicación completa de una máquina virtual, tarea para la que existen herramientas especializadas como AWS Transform MGN.

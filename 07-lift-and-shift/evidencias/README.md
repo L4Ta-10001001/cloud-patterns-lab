@@ -13,6 +13,7 @@
 | `08-ec2-http.txt` | HTTP 200 en `/health` y `/` desde la IP pública de EC2. |
 | `09-sha256-comparison.txt` | Hashes idénticos entre la VM on-premise y EC2. |
 | `10-terraform-no-changes.txt` | `terraform plan` final: `No changes. Your infrastructure matches the configuration.` |
+| `11-terraform-destroy.txt` | Limpieza del paso 8: `Apply complete! Resources: 0 added, 0 changed, 8 destroyed.` La instancia quedó `terminated`. Solo se destruyeron recursos del lab 07. |
 
 No se versionaron `terraform.tfvars`, estados, planes ni claves privadas. La
 clave pública sí es importada por Terraform como recurso `aws_key_pair`.
