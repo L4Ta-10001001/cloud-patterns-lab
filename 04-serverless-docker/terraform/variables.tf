@@ -22,6 +22,17 @@ variable "enable_ecs" {
   default     = false
 }
 
+variable "desired_count" {
+  description = "Numero de tareas Fargate. Null mantiene el comportamiento por defecto (2 con ALB, 1 sin ALB); 0 detiene la tarea sin destruir el servicio."
+  type        = number
+  default     = null
+
+  validation {
+    condition     = var.desired_count == null || (var.desired_count >= 0 && var.desired_count <= 10)
+    error_message = "desired_count debe estar entre 0 y 10, o ser null."
+  }
+}
+
 variable "image_tag" {
   description = "Etiqueta de la imagen Docker subida a ECR."
   type        = string

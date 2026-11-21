@@ -90,13 +90,16 @@ no eran necesarios:
 | Laboratorio | Acción final | Resultado |
 | ----------- | ------------ | --------- |
 | 07 | `terraform destroy` sobre su propio estado | 8 recursos destruidos; EC2 `terminated`; 0 recursos en el state |
-| 05 | `enable_lab05 = false` y `enable_lab05_alb = false` en `terraform.tfvars` local | 0 ALB, 0 API Gateway; ECS reducido a 1 tarea (`desired=1`, `running=1`) |
-| 04 | Sin cambios | Lambda, ECR, cluster y servicio ECS siguen activos |
+| 05 | `enable_lab05 = false` y `enable_lab05_alb = false` en `terraform.tfvars` local | 0 ALB, 0 API Gateway |
+| 04 | `desired_count = 0` en `terraform.tfvars` local | Lambda, ECR, cluster y servicio ECS siguen activos, pero con **0 tareas Fargate** (`desired=0`, `running=0`) |
 
-La VM local de laboratorio 07 se apagó al terminar. El archivo
-`terraform.tfvars` modificado para la desactivación del laboratorio 05 está
-ignorado por Git, por lo que el repositorio conserva los laboratorios 04 y 05
-tal como fueron entregados.
+La VM local de laboratorio 07 se apagó al terminar. Los archivos
+`terraform.tfvars` modificados para la desactivación del laboratorio 05 y para
+detener las tareas del 04 están ignorados por Git, por lo que el repositorio
+conserva la configuración por defecto de ambos laboratorios. La variable
+`desired_count` agregada al laboratorio 04 tiene valor por defecto `null`, que
+mantiene el comportamiento original (2 tareas con ALB, 1 sin ALB); basta con
+quitar la línea del `tfvars` local para reactivar la demostración.
 
 ## Tecnologías
 
