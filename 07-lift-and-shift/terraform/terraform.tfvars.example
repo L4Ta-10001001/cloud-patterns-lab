@@ -1,0 +1,15 @@
+# Copiar a terraform.tfvars y actualizar con tu IP real obtenida con:
+# curl -4 https://checkip.amazonaws.com
+# allowed_cidr: IP que AWS ve para SSH directo (puede averiguarse con
+#   ss -tn | grep ':22 ' dentro de la instancia tras una conexion de prueba).
+# http_allowed_cidr: IP de salida del trafico HTTP. Si tu red usa proxy,
+#   suele coincidir con la que devuelve checkip.amazonaws.com.
+aws_region = "us-east-1"
+allowed_cidr = "198.51.100.7/32" # EJEMPLO: REEMPLAZAR con tu IPv4 publica actual
+# http_allowed_cidr = "198.51.100.7/32" # EJEMPLO: solo si difiere de allowed_cidr
+instance_type = "t3.micro"
+create_key_pair = true
+public_key_path = "~/.ssh/cloudlab-liftshift.pub"
+# Si AWS Academy no permite crear key pairs y ya tienes una valida:
+# create_key_pair = false
+# existing_key_name = "NOMBRE_DE_KEY_PAIR_EXISTENTE"

@@ -1,0 +1,13 @@
+test_health (test_server.RehostingAppTests.test_health) ... 127.0.0.1 - - [21/Nov/2026 01:07:25] "GET /health HTTP/1.1" 200 -
+ok
+test_main_page (test_server.RehostingAppTests.test_main_page) ... 127.0.0.1 - - [21/Nov/2026 01:07:25] "GET / HTTP/1.1" 200 -
+ok
+test_unknown_route_returns_404 (test_server.RehostingAppTests.test_unknown_route_returns_404) ... 127.0.0.1 - - [21/Nov/2026 01:07:25] "GET /missing HTTP/1.1" 404 -
+/usr/lib/python3.14/tempfile.py:538: ResourceWarning: Implicitly cleaning up <HTTPError 404: 'Not Found'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.520s
+
+OK

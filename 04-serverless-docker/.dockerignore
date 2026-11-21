@@ -1,0 +1,13 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+*.pyc
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+tests
+lambda
+evidencias

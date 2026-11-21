@@ -1,0 +1,27 @@
+$ terraform plan -no-color
+aws_ecs_task_definition.api[0]: Refreshing state... [id=cloudlab-erik-api]
+aws_lambda_function.demo: Refreshing state... [id=cloudlab-erik-lambda]
+module.lab05[0].aws_lambda_permission.api_gateway: Refreshing state... [id=AllowCloudPatternsLab05APIGateway]
+module.lab05[0].aws_apigatewayv2_integration.lambda: Refreshing state... [id=fcfmim4]
+module.lab05[0].aws_apigatewayv2_route.health: Refreshing state... [id=26tc0gh]
+module.lab05[0].aws_apigatewayv2_route.root: Refreshing state... [id=mvoyi5l]
+aws_ecs_service.api[0]: Refreshing state... [id=arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-cluster/cloudlab-erik-api]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+$ terraform output
+ecr_repository_url = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-api"
+ecs_cluster_name = "cloudlab-erik-cluster"
+ecs_service_name = "cloudlab-erik-api"
+lab05_alb_dns_name = "cloudlab-erik-alb-729776504.us-east-1.elb.amazonaws.com"
+lab05_api_gateway_url = "https://apm370rtne.execute-api.us-east-1.amazonaws.com"
+lab05_target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:533267299755:targetgroup/cloudlab-erik-tg/9eb4f2dd4c004e18"
+lambda_function_name = "cloudlab-erik-lambda"
+public_subnet_ids = [
+  "subnet-0616ec95dfba25c73",
+  "subnet-06ffe2447f2f7c28b",
+]
+vpc_id = "vpc-08d0c468757d531f6"

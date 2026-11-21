@@ -1,0 +1,16 @@
+$ curl -i http://3.235.42.178:8080/health
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.12.3
+Date: Sat, 21 Nov 2026 06:24:01 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 16
+
+{"status": "ok"}
+$ curl -i http://3.235.42.178:8080/
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.12.3
+Date: Sat, 21 Nov 2026 06:24:01 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 116
+
+{"app": "legacy-demo", "version": "1.0", "message": "Aplicacion heredada funcionando", "hostname": "ip-10-70-1-122"}
