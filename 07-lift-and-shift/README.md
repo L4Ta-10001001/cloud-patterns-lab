@@ -1,176 +1,199 @@
 # Laboratorio 07 — Lift-and-Shift (On-Premise → AWS EC2)
 
-**Responsable:** Erik. **Objetivo:** demostrar una migración simple **sin modificar el código** de una app Python ejecutada primero en una VM Ubuntu 24.04 local y luego en EC2 Ubuntu 24.04. Terraform crea la infraestructura de destino. **No modifica ni reutiliza el estado Terraform de Lab04/05.**
+**Responsable:** Erik · **Estado:** completado (10/10) · **Rama:** `erik/practicas`
 
-> Alcance académico: **rehosting de una carga de trabajo simple**, no clonación completa del sistema operativo ni replicación de discos. Para migrar un servidor completo existe AWS Transform MGN (antes AWS Application Migration Service).
+Demostración de **rehosting sin cambiar el código**: una aplicación Python
+ejecutada primero en una VM Ubuntu local y después en una instancia EC2, con la
+infraestructura de destino creada por Terraform. El archivo de la aplicación se
+extrae **de la VM on-premise**, se transfiere a EC2 y se comprueba que el hash
+SHA256 es idéntico.
 
-## 0. Requisitos
+> Alcance académico: se migra una carga de trabajo simple (código + unidad
+> `systemd`), no se clona el sistema operativo ni se replican discos. Para una
+> migración completa de servidores existe AWS Transform MGN (antes AWS
+> Application Migration Service).
 
-- Equipo Arch Linux con `git`, `python3`, `openssh`, `curl`, `terraform`, `aws-cli`.
-- **VM Ubuntu Server 24.04 local**, encendida, con red accesible desde Arch y `openssh-server` activo. Puede ser VirtualBox, KVM/virt-manager o Proxmox. Anota `VM_USER` y `VM_IP`.
-- Cuenta AWS Academy activa y credenciales `AWS_PROFILE=lab` válidas, región `us-east-1`.
-- EC2 `t3.micro` permitida y permiso para crear recursos de EC2/VPC/KeyPair (si está restringido, revisar el plan y la consola).
-- Tu IP pública actual, para permitir únicamente tu `/32` en SSH y HTTP 8080.
-- Comprobar créditos/costos y limpiar EC2 tras obtener evidencias.
+## 1. Contenido del laboratorio
 
-## 1. Ejecutar los tests antes de migrar (desde Arch)
+```
+07-lift-and-shift/
+├── app/server.py                  # aplicación heredada (sin modificaciones)
+├── systemd/legacyapp.service      # unidad systemd del servicio
+├── scripts/install-app.sh         # instalador usado en origen y destino
+├── terraform/                     # VPC, subred, IGW, rutas, SG, key pair y EC2
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── versions.tf
+│   └── terraform.tfvars.example
+├── tests/test_server.py           # 3 pruebas unitarias
+├── evidencias/                    # 13 archivos, índice en su README
+├── README.md                      # este documento
+├── ARQUITECTURA.md                # diagrama y decisiones de diseño
+└── INFORME.md                     # texto de apoyo y resultados reales
+```
 
-Desde la raíz del repositorio:
+El estado Terraform es **independiente** de los laboratorios 04 y 05.
+
+## 2. Entorno real utilizado
+
+| Elemento | Valor |
+| -------- | ----- |
+| Host | Arch Linux con `/dev/kvm` disponible |
+| Hipervisor | QEMU/KVM en modo usuario (`-netdev user`), sin libvirt |
+| VM on-premise | `onprem-legacy-server`, Ubuntu 24.04.5 LTS, Python 3.12.3, 1 vCPU / 2 GB / 15 GB |
+| Acceso a la VM | SSH `127.0.0.1:2222` → puerto 22; HTTP `127.0.0.1:8088` → puerto 8080 |
+| AWS | Cuenta `533267299755`, región `us-east-1`, perfil `lab`, rol `LabRole` |
+| EC2 | `i-03175f428ac57d526`, `cloudlab-erik-liftshift-ec2`, `t3.micro`, IP `3.235.42.178` |
+| Hash de `server.py` | `03b47adf2f62b2ebe85bfd0c91899c199dd63243df95d635fa6ac407c1ed8230` (idéntico en origen y destino) |
+
+El puerto HTTP de la VM se publicó en `127.0.0.1:8088` para no interferir con
+el contenedor del laboratorio 04, que usa `8080` en el mismo host.
+
+## 3. Reproducción paso a paso
+
+### 3.1 Tests e incorporación al repositorio
 
 ```bash
+cd ~/Documents/university/prograDistribuida/cloud-patterns-lab
+git switch erik/practicas
+git pull --ff-only origin erik/practicas
+
 python3 -m unittest discover -s 07-lift-and-shift/tests -v \
   2>&1 | tee 07-lift-and-shift/evidencias/01-tests.txt
+# Ran 3 tests ... OK
 ```
 
-Se deben superar tres pruebas: `/health`, `/` y error 404.
+### 3.2 Entorno on-premise
 
-## 2. Preparar On-Premise: VM Ubuntu
-
-Crear una VM Ubuntu Server 24.04 (ejemplo: 1 vCPU, 1–2 GB RAM, 10 GB disco), conectada por una red accesible desde el host Arch. En la VM:
+Se usó una imagen cloud oficial de Ubuntu 24.04 con `cloud-init` para inyectar
+la clave pública `~/.ssh/cloudlab-onprem`. En la VM quedó instalada la
+aplicación como servicio `systemd`:
 
 ```bash
-sudo apt-get update
-sudo apt-get install -y python3 openssh-server curl
-sudo systemctl enable --now ssh
-hostname -I
+ssh -i ~/.ssh/cloudlab-onprem -p 2222 ubuntu@127.0.0.1 \
+  'mkdir -p ~/lab07'
+scp -P 2222 -i ~/.ssh/cloudlab-onprem -r \
+  07-lift-and-shift/app 07-lift-and-shift/systemd 07-lift-and-shift/scripts \
+  ubuntu@127.0.0.1:/home/ubuntu/lab07/
+ssh -i ~/.ssh/cloudlab-onprem -p 2222 ubuntu@127.0.0.1 \
+  'echo "<password-sudo-local>" | sudo -S bash ~/lab07/scripts/install-app.sh'
+
+curl -i http://127.0.0.1:8088/health
+ssh -i ~/.ssh/cloudlab-onprem -p 2222 ubuntu@127.0.0.1 \
+  'systemctl is-active legacyapp; sha256sum /opt/legacyapp/server.py'
+# active
+# 03b47adf...  /opt/legacyapp/server.py
 ```
 
-En tu Arch exporta IP/usuario reales de la VM:
+> En este entorno `libvirt` no era utilizable: `sudo` pedía contraseña
+> interactiva y `/var/lib/libvirt/images` no era escribible, aunque `/dev/kvm`
+> sí estaba disponible. Por eso se empleó QEMU en modo usuario con las
+> redirecciones de puertos indicadas. Con VirtualBox, Proxmox o libvirt se puede
+> seguir el mismo procedimiento usando la IP real de la VM.
+
+### 3.3 Infraestructura AWS con Terraform
 
 ```bash
-export VM_USER='USUARIO_DE_LA_VM'
-export VM_IP='IP_PRIVADA_DE_LA_VM'
-ssh "$VM_USER@$VM_IP" 'mkdir -p "$HOME/lab07"'
-```
-
-**Desde la raíz del repositorio**, envía los archivos de aplicación, `systemd` y el instalador a la VM:
-
-```bash
-scp -r 07-lift-and-shift/app 07-lift-and-shift/systemd \
-  07-lift-and-shift/scripts "$VM_USER@$VM_IP:/home/$VM_USER/lab07/"
-ssh "$VM_USER@$VM_IP" 'sudo bash ~/lab07/scripts/install-app.sh'
-```
-
-Comprobar y guardar evidencias en Arch:
-
-```bash
-curl -i "http://$VM_IP:8080/health" | tee 07-lift-and-shift/evidencias/02-onprem-health.txt
-ssh "$VM_USER@$VM_IP" 'sudo systemctl is-active legacyapp; sha256sum /opt/legacyapp/server.py' \
-  | tee 07-lift-and-shift/evidencias/03-onprem-service.txt
-```
-
-La VM debe tener el servicio `legacyapp` activo y responder `HTTP 200`.
-
-## 3. Preparar Terraform de AWS (estado separado)
-
-En Arch, desde la raíz del repo:
-
-```bash
-export AWS_PROFILE=lab
-export AWS_DEFAULT_REGION=us-east-1
+export AWS_PROFILE=lab AWS_DEFAULT_REGION=us-east-1
 aws sts get-caller-identity
-ssh-keygen -t ed25519 -f ~/.ssh/cloudlab-liftshift -C 'cloudlab-liftshift'   # solo si no existe esa clave
+
+ssh-keygen -t ed25519 -f ~/.ssh/cloudlab-liftshift -C 'cloudlab-liftshift'
 chmod 600 ~/.ssh/cloudlab-liftshift
+
 cd 07-lift-and-shift/terraform
 cp terraform.tfvars.example terraform.tfvars
-curl -4 https://checkip.amazonaws.com
-```
+# Completar: aws_region, allowed_cidr (SSH), http_allowed_cidr (HTTP),
+# instance_type, create_key_pair y public_key_path.
 
-Editar `terraform.tfvars` y reemplazar el CIDR de ejemplo por tu IP pública real terminada en `/32`. Terraform creará **una VPC nueva**, subred pública, Internet Gateway, rutas, SG limitado y EC2 Ubuntu 24.04; no modifica el estado de otros labs.
-
-```bash
-terraform fmt -check
 terraform init
+terraform fmt -recursive
 terraform validate
 terraform plan -out=tfplan | tee ../evidencias/04-terraform-plan.txt
-```
-
-Verificar que el plan solo cree recursos `lab07` y no elimine o altere otros recursos. Aplicar:
-
-```bash
-terraform apply tfplan | tee ../evidencias/05-terraform-apply.txt
+terraform apply tfplan     | tee ../evidencias/05-terraform-apply.txt
 terraform output
-terraform plan | tee ../evidencias/10-terraform-no-changes.txt
-export EC2_IP="$(terraform output -raw instance_public_ip)"
+# instance_public_ip = 3.235.42.178
 ```
 
-Si `aws_key_pair` falla por permisos AWS Academy, `create_key_pair=false` y `existing_key_name` permite usar una key pair válida creada previamente. El archivo privado correspondiente debe estar en tu equipo y debes usarlo en el SSH. No inventes llaves privadas ni desactives controles de seguridad.
+**Nota de red:** `curl -4 https://checkip.amazonaws.com` devuelve
+`157.100.142.229/32`, pero el tráfico SSH desde este laboratorio sale por
+`181.199.46.145/32`. El Security Group autoriza la primera IP en el puerto
+8080 (HTTP) y la segunda en el 22 (SSH), gracias a la variable
+`http_allowed_cidr`. Sin este ajuste el SSH funcionaba pero el HTTP expiraba.
 
-## 4. Migrar los mismos archivos desde la VM local
-
-En tu Arch, desde la raíz del repositorio (si aún estás en `terraform/`, vuelve a la raíz con `cd ../..`):
+### 3.4 Migración real desde la VM
 
 ```bash
-# Si necesitas reconstruir EC2_IP desde la raíz:
+cd ../..
 export EC2_IP="$(terraform -chdir=07-lift-and-shift/terraform output -raw instance_public_ip)"
 export KEY="$HOME/.ssh/cloudlab-liftshift"
 
-# 4.1 Extraer DIRECTAMENTE los archivos instalados en la VM (no copiar el código del repositorio)
 mkdir -p /tmp/cloudlab07-migration/{app,systemd,scripts}
-scp "$VM_USER@$VM_IP:/opt/legacyapp/server.py" /tmp/cloudlab07-migration/app/
-scp "$VM_USER@$VM_IP:/etc/systemd/system/legacyapp.service" /tmp/cloudlab07-migration/systemd/
+scp -P 2222 -i ~/.ssh/cloudlab-onprem \
+  ubuntu@127.0.0.1:/opt/legacyapp/server.py /tmp/cloudlab07-migration/app/
+scp -P 2222 -i ~/.ssh/cloudlab-onprem \
+  ubuntu@127.0.0.1:/etc/systemd/system/legacyapp.service /tmp/cloudlab07-migration/systemd/
 cp 07-lift-and-shift/scripts/install-app.sh /tmp/cloudlab07-migration/scripts/
 
-# 4.2 Verificar el hash extraído
-sha256sum /tmp/cloudlab07-migration/app/server.py
-
-# 4.3 Enviar el material de la VM al destino EC2
 ssh -i "$KEY" "ubuntu@$EC2_IP" 'mkdir -p /home/ubuntu/lab07'
-scp -i "$KEY" -r /tmp/cloudlab07-migration/app \
-  /tmp/cloudlab07-migration/systemd /tmp/cloudlab07-migration/scripts \
+scp -i "$KEY" -r /tmp/cloudlab07-migration/{app,systemd,scripts} \
   "ubuntu@$EC2_IP:/home/ubuntu/lab07/"
-
-# 4.4 Instalar EXACTAMENTE los archivos de la VM en EC2
-ssh -i "$KEY" "ubuntu@$EC2_IP" 'sudo bash /home/ubuntu/lab07/scripts/install-app.sh'
+ssh -i "$KEY" "ubuntu@$EC2_IP" \
+  'echo "<password-sudo-local>" | sudo -S bash /home/ubuntu/lab07/scripts/install-app.sh'
 ```
 
-No refactorizar ni editar `server.py` ni `legacyapp.service` entre origen y destino.
+No se editaron `server.py` ni `legacyapp.service` entre origen y destino.
 
-## 5. Comprobar el resultado y guardar evidencias
-
-En Arch, desde la raíz del repositorio:
+### 3.5 Verificación
 
 ```bash
 ssh -i "$KEY" "ubuntu@$EC2_IP" \
-  'sudo systemctl is-active legacyapp; sha256sum /opt/legacyapp/server.py' \
-  | tee 07-lift-and-shift/evidencias/07-ec2-service.txt
-
-curl -i "http://$EC2_IP:8080/health" | tee 07-lift-and-shift/evidencias/08-ec2-http.txt
-curl -s "http://$EC2_IP:8080/"
-
-{
-  echo 'ORIGEN (VM local)'; ssh "$VM_USER@$VM_IP" 'sha256sum /opt/legacyapp/server.py'
-  echo 'DESTINO (EC2)'; ssh -i "$KEY" "ubuntu@$EC2_IP" 'sha256sum /opt/legacyapp/server.py'
-} | tee 07-lift-and-shift/evidencias/09-sha256-comparison.txt
+  'systemctl is-active legacyapp; sha256sum /opt/legacyapp/server.py'
+curl -i "http://$EC2_IP:8080/health"
+# HTTP/1.0 200 OK  {"status": "ok"}
 ```
 
-Los dos hashes de `server.py` deben ser **idénticos** (al comparar, ignorar el texto de la ruta). `curl` debe devolver HTTP 200 tanto en origen como destino. Capturar una imagen real de **EC2 → Instances → cloudlab-erik-liftshift-ec2 → Running**, y guardar como `evidencias/06-ec2-instance.png`.
+La evidencia `09-sha256-comparison.txt` muestra el mismo hash en ambas
+máquinas. La captura `06-ec2-instance.png` muestra la consola AWS con la
+instancia en estado `Running`.
 
-**Criterio de aceptación:** la misma app y archivo de servicio que funcionaban en la VM funcionan en EC2; no se hicieron cambios en la lógica; logs y hash verificables.
+## 4. Resultado de la ejecución
 
-## 6. GitHub
+| Comprobación | Resultado real |
+| ------------ | -------------- |
+| Pruebas unitarias | 3 tests, `OK` |
+| Servicio en VM | `active`, `/health` → HTTP 200 |
+| Terraform apply | `8 added, 0 changed, 0 destroyed` |
+| Servicio en EC2 | `active`, Ubuntu 24.04.5 LTS |
+| HTTP en AWS | HTTP 200 en `/health` y `/` |
+| SHA256 | idéntico en VM y EC2 |
+| Plan final antes de limpiar | `No changes. Your infrastructure matches the configuration.` |
+| Limpieza | `8 destroyed`, instancia `terminated`, state vacío |
 
-Desde la raíz del repo:
+Detalle completo: [índice de evidencias](evidencias/README.md) e
+[informe](INFORME.md). Diagrama: [arquitectura](ARQUITECTURA.md).
 
-```bash
-git status
-git add 07-lift-and-shift/
-git diff --cached --stat
-# IMPORTANTE: verificar que no haya contraseñas, key privada, tfstate, tfvars, tfplan
+## 5. Seguridad
 
-git commit -m 'feat(lab07): rehost onprem Python app to EC2 with Terraform'
-git push origin erik/practicas
-```
+- La clave privada `~/.ssh/cloudlab-liftshift` y la de la VM
+  `~/.ssh/cloudlab-onprem` se guardan solo en el equipo local.
+- No se versionan `terraform.tfvars`, `terraform.tfstate`, planes ni claves
+  privadas; la clave pública se registra como recurso `aws_key_pair`.
+- SSH y HTTP se limitan a direcciones `/32` concretas.
+- La contraseña de `sudo` de la VM es un valor local de laboratorio y tampoco
+  se versiona.
 
-## 7. Costos: limpiar solo Lab07
+## 6. Estado final y costos
 
-Desde `07-lift-and-shift/terraform`:
+La instancia EC2 y el resto de recursos del laboratorio 07 se eliminaron con
+`terraform destroy` **después** de guardar las evidencias, porque AWS cobra por
+instancias EC2 y direcciones IPv4 públicas. La VM local se apagó una vez
+finalizada la migración. Los laboratorios 04 y 05 no fueron afectados por esta
+destrucción; la infraestructura opcional del laboratorio 05 se desactivó por
+separado usando sus propios flags de Terraform.
 
-```bash
-terraform plan -destroy
-terraform destroy
-```
+Commits de esta entrega en `erik/practicas`:
 
-Se eliminarán los recursos **gestionados por el estado de Lab07**. No destruye Lab04/05 si están en su carpeta y estado separado. `terraform destroy` elimina EC2 y sus datos locales; conservar antes las evidencias. Dejar el estado y archivos necesarios en el ordenador para administración, pero no subirlos a Git.
-
-**Atención:** un ALB y dos tareas Fargate del Lab05 siguen generando cargos por separado. Limpiarlos requiere trabajar en el **Terraform de Lab04/05** con sus propios flags y revisar cuidadosamente su `plan`; no usar `terraform destroy` sobre esos labs si se quieren conservar Lambda/ECR u otros recursos.
+- `6de6b96` — `feat(lab07): rehost onprem application to EC2 with Terraform`
+- `1cb1bb7` — `docs(evidence): add EC2 console screenshot for lab07`
+- `995d867` — `chore(lab07): destroy EC2 lab resources and document cleanup`
