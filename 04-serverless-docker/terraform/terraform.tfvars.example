@@ -1,0 +1,10 @@
+aws_region          = "us-east-1"
+project_prefix      = "cloudlab-erik"
+execution_role_name = "LabRole"
+
+# Primera ejecucion: false. Una vez cargada imagen en ECR: true.
+enable_ecs = false
+image_tag  = "v1"
+
+# En el segundo despliegue cambiar por TU IPv4 publica /32.
+allowed_cidr = "127.0.0.1/32"
