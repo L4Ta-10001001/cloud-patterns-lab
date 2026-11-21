@@ -8,7 +8,7 @@
 | `04-terraform-plan.txt` | Plan inicial: 8 recursos nuevos, 0 cambios, 0 destrucciones. |
 | `04b-terraform-cidr-fix.txt` | Ajuste de CIDR: la red tiene dos IP de salida (SSH directo `181.199.46.145`, HTTP vía proxy `157.100.142.229`). |
 | `05-terraform-apply.txt` | `Apply complete! Resources: 8 added, 0 changed, 0 destroyed.` |
-| `06-ec2-instance.png` | **Pendiente**: captura real de la consola AWS mostrando `cloudlab-erik-liftshift-ec2` en estado `Running`. |
+| `06-ec2-instance.png` | Captura real de consola AWS: EC2 → Instances → `i-03175f428ac57d526` (`cloudlab-erik-liftshift-ec2`) en estado `Running`, IP pública `3.235.42.178`, tipo `t3.micro` y VPC `cloudlab-erik-lab07-vpc`. |
 | `07-ec2-service.txt` | `legacyapp` en estado `active` en EC2 y SHA256 del archivo migrado. |
 | `08-ec2-http.txt` | HTTP 200 en `/health` y `/` desde la IP pública de EC2. |
 | `09-sha256-comparison.txt` | Hashes idénticos entre la VM on-premise y EC2. |
