@@ -1,0 +1,120 @@
+$ aws sts get-caller-identity
+--------------------------------------------------------------------------------
+|                               GetCallerIdentity                              |
++---------+--------------------------------------------------------------------+
+|  Account|  533267299755                                                      |
+|  Arn    |  arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15   |
+|  UserId |  AROAXYKJVHWV5RYQ7XCQD:user5153321=ee15                            |
++---------+--------------------------------------------------------------------+
+$ aws iam get-role --role-name LabRole
+
+aws: [ERROR]: An error occurred (AccessDenied) when calling the GetRole operation: User: arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15 is not authorized to perform: iam:GetRole on resource: role LabRole with an explicit deny in an identity-based policy: arn:aws:iam::533267299755:policy/voc-cancel-cred. Go to https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/authorization-details/5d2xusfvmwcqarnogt2vubctk for complete details, or call the GetRequestAuthorizationDetails API with the following authorization id: 5d2xusfvmwcqarnogt2vubctk
+$ terraform plan -no-color
+data.archive_file.lambda: Reading...
+data.archive_file.lambda: Read complete after 0s [id=f8dfbf21f6621da873e11b189bf056824c3204b1]
+data.aws_iam_role.lab: Reading...
+data.aws_availability_zones.available[0]: Reading...
+aws_ecr_repository.api: Refreshing state... [id=cloudlab-erik-api]
+aws_ecs_cluster.demo: Refreshing state... [id=arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-cluster]
+aws_cloudwatch_log_group.ecs[0]: Refreshing state... [id=/ecs/cloudlab-erik-api]
+aws_vpc.demo[0]: Refreshing state... [id=vpc-08d0c468757d531f6]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform planned the following actions, but then encountered a problem:
+
+  # module.lab05[0].aws_apigatewayv2_api.demo will be created
+  + resource "aws_apigatewayv2_api" "demo" {
+      + api_endpoint                 = (known after apply)
+      + api_key_selection_expression = "$request.header.x-api-key"
+      + arn                          = (known after apply)
+      + execution_arn                = (known after apply)
+      + id                           = (known after apply)
+      + ip_address_type              = (known after apply)
+      + name                         = "cloudlab-erik-http-api"
+      + protocol_type                = "HTTP"
+      + region                       = "us-east-1"
+      + route_selection_expression   = "$request.method $request.path"
+      + tags_all                     = {
+          + "Environment" = "AcademicLab"
+          + "ManagedBy"   = "Terraform"
+          + "Owner"       = "Erik"
+          + "Project"     = "CloudPatternsLab"
+        }
+    }
+
+  # module.lab05[0].aws_apigatewayv2_stage.default will be created
+  + resource "aws_apigatewayv2_stage" "default" {
+      + api_id        = (known after apply)
+      + arn           = (known after apply)
+      + auto_deploy   = true
+      + deployment_id = (known after apply)
+      + execution_arn = (known after apply)
+      + id            = (known after apply)
+      + invoke_url    = (known after apply)
+      + name          = "$default"
+      + region        = "us-east-1"
+      + tags_all      = {
+          + "Environment" = "AcademicLab"
+          + "ManagedBy"   = "Terraform"
+          + "Owner"       = "Erik"
+          + "Project"     = "CloudPatternsLab"
+        }
+
+      + default_route_settings {
+          + data_trace_enabled       = false
+          + detailed_metrics_enabled = false
+          + logging_level            = (known after apply)
+          + throttling_burst_limit   = 10
+          + throttling_rate_limit    = 5
+        }
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + lab05_api_gateway_url = (known after apply)
+
+Error: reading IAM Role (LabRole): operation error IAM: GetRole, https response error StatusCode: 403, RequestID: 6aef6a8a-ffe6-44d8-91e4-568822753e46, api error AccessDenied: User: arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15 is not authorized to perform: iam:GetRole on resource: role LabRole with an explicit deny in an identity-based policy: arn:aws:iam::533267299755:policy/voc-cancel-cred. Go to https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/authorization-details/c7sgzp101emmpztxupuc8x13n for complete details, or call the GetRequestAuthorizationDetails API with the following authorization id: c7sgzp101emmpztxupuc8x13n
+
+  with data.aws_iam_role.lab,
+  on main.tf line 3, in data "aws_iam_role" "lab":
+   3: data "aws_iam_role" "lab" {
+
+
+Error: reading ECR Repository (cloudlab-erik-api): operation error ECR: DescribeRepositories, https response error StatusCode: 400, RequestID: 7888baf1-c417-4553-a1a5-2a9a7a38fb13, api error AccessDeniedException: User: arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15 is not authorized to perform: ecr:DescribeRepositories on resource: arn:aws:ecr:us-east-1:533267299755:repository/cloudlab-erik-api with an explicit deny in an identity-based policy: arn:aws:iam::533267299755:policy/voc-cancel-cred. Go to https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/authorization-details/3d7etija4x0pi6w5kadqqfrl for complete details, or call the GetRequestAuthorizationDetails API with the following authorization id: 3d7etija4x0pi6w5kadqqfrl
+
+  with aws_ecr_repository.api,
+  on main.tf line 24, in resource "aws_ecr_repository" "api":
+  24: resource "aws_ecr_repository" "api" {
+
+
+Error: reading ECS Cluster (arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-cluster): operation error ECS: DescribeClusters, https response error StatusCode: 400, RequestID: 313c8737-6e59-40c4-b620-1f3bd53fee84, AccessDeniedException: User: arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15 is not authorized to perform: ecs:DescribeClusters on resource: arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-cluster with an explicit deny in an identity-based policy: arn:aws:iam::533267299755:policy/voc-cancel-cred
+
+  with aws_ecs_cluster.demo,
+  on main.tf line 33, in resource "aws_ecs_cluster" "demo":
+  33: resource "aws_ecs_cluster" "demo" {
+
+
+Error: fetching Availability Zones: operation error EC2: DescribeAvailabilityZones, https response error StatusCode: 403, RequestID: 9dcba65c-be4c-447d-ab14-07e1612bc20a, api error UnauthorizedOperation: You are not authorized to perform this operation. User: arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15 is not authorized to perform: ec2:DescribeAvailabilityZones with an explicit deny in an identity-based policy: arn:aws:iam::533267299755:policy/voc-cancel-cred. Go to https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/authorization-details/azvqh3deloru3wnm91bvnw6cv for complete details, or call the GetRequestAuthorizationDetails API with the following authorization id: azvqh3deloru3wnm91bvnw6cv
+
+  with data.aws_availability_zones.available[0],
+  on main.tf line 38, in data "aws_availability_zones" "available":
+  38: data "aws_availability_zones" "available" {
+
+
+Error: reading EC2 VPC (vpc-08d0c468757d531f6): operation error EC2: DescribeVpcs, https response error StatusCode: 403, RequestID: 0804a241-82eb-483c-9d4e-9c7ea4b4b193, api error UnauthorizedOperation: You are not authorized to perform this operation. User: arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15 is not authorized to perform: ec2:DescribeVpcs with an explicit deny in an identity-based policy: arn:aws:iam::533267299755:policy/voc-cancel-cred. Go to https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/authorization-details/c5r988lv43aw7a55x2s8gg1ug for complete details, or call the GetRequestAuthorizationDetails API with the following authorization id: c5r988lv43aw7a55x2s8gg1ug
+
+  with aws_vpc.demo[0],
+  on main.tf line 43, in resource "aws_vpc" "demo":
+  43: resource "aws_vpc" "demo" {
+
+
+Error: reading CloudWatch Logs Log Group (/ecs/cloudlab-erik-api): listing CloudWatch Logs Log Groups: operation error CloudWatch Logs: DescribeLogGroups, https response error StatusCode: 400, RequestID: 353dd7f2-07a2-40b2-ba52-a62933fa03e0, AccessDeniedException: User: arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15 is not authorized to perform: logs:DescribeLogGroups on resource: arn:aws:logs:us-east-1:533267299755:log-group::log-stream: with an explicit deny in an identity-based policy: arn:aws:iam::533267299755:policy/voc-cancel-cred
+
+  with aws_cloudwatch_log_group.ecs[0],
+  on main.tf line 107, in resource "aws_cloudwatch_log_group" "ecs":
+ 107: resource "aws_cloudwatch_log_group" "ecs" {
+

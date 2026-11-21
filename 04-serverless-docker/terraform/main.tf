@@ -87,7 +87,7 @@ resource "aws_security_group" "ecs" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_http" {
-  count             = var.enable_ecs ? 1 : 0
+  count             = var.enable_ecs && !var.enable_lab05_alb ? 1 : 0
   security_group_id = aws_security_group.ecs[0].id
   cidr_ipv4         = var.allowed_cidr
   from_port         = 8080
@@ -149,7 +149,7 @@ resource "aws_ecs_service" "api" {
   name            = "${var.project_prefix}-api"
   cluster         = aws_ecs_cluster.demo.id
   task_definition = aws_ecs_task_definition.api[0].arn
-  desired_count   = 1
+  desired_count   = var.enable_lab05_alb ? 2 : 1
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -158,5 +158,14 @@ resource "aws_ecs_service" "api" {
     assign_public_ip = true # Solo laboratorio; mas adelante se usara ALB.
   }
 
-  depends_on = [aws_route_table_association.public]
+  dynamic "load_balancer" {
+    for_each = var.enable_lab05 && var.enable_lab05_alb ? [1] : []
+    content {
+      target_group_arn = module.lab05[0].target_group_arn
+      container_name   = "api"
+      container_port   = 8080
+    }
+  }
+
+  depends_on = [aws_route_table_association.public, module.lab05, aws_vpc_security_group_ingress_rule.ecs_from_alb]
 }
