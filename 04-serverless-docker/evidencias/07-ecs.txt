@@ -1,0 +1,21 @@
+$ aws ecs describe-services --cluster cloudlab-erik-cluster --services cloudlab-erik-api
+------------------------------------------------------------------------------------------
+|                                    DescribeServices                                    |
++------------+---------------------------------------------------------------------------+
+|  Desired   |  1                                                                        |
+|  LaunchType|  FARGATE                                                                  |
+|  Name      |  cloudlab-erik-api                                                        |
+|  Running   |  1                                                                        |
+|  Status    |  ACTIVE                                                                   |
+|  TaskDef   |  arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-api:1   |
++------------+---------------------------------------------------------------------------+
+$ aws ecs describe-tasks (lastStatus)
+---------------------------------------------------------------------------------------------------------------------
+|                                                   DescribeTasks                                                   |
++---------------+---------------------------------------------------------------------------------------------------+
+|  DesiredStatus|  RUNNING                                                                                          |
+|  ENI          |  eni-0a486e9be3a7db4ac                                                                            |
+|  LastStatus   |  RUNNING                                                                                          |
+|  Task         |  arn:aws:ecs:us-east-1:533267299755:task/cloudlab-erik-cluster/dbb8ecc3bc7f4184b2ec3777db9d1250   |
++---------------+---------------------------------------------------------------------------------------------------+
+TASK_PUBLIC_IP=100.59.10.65
