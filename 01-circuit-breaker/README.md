@@ -1,6 +1,8 @@
 # Laboratorio 01 — Circuit Breaker con FastAPI, Docker y AWS
 
-**Responsable:** Erik · **Rama:** `erik/circuit-breaker` · **Proyecto:** Cloud Patterns Lab
+**Responsable:** Erik · **Estado:** Completado e integrado · **Proyecto:** Cloud Patterns Lab
+
+**Rama de desarrollo:** `erik/circuit-breaker` · **Integración:** PR #3 → `erik/practicas` → PR #4 → `main`
 
 ## Objetivo
 
@@ -11,6 +13,23 @@ ejecutar la misma solución en Docker Compose y en Amazon ECS Fargate.
 La implementación usa **PyBreaker 1.4.x** en lugar de reimplementar la máquina
 de estados. El cliente es un microservicio FastAPI; el backend es un segundo
 microservicio que puede responder correctamente o fallar de forma controlada.
+
+## Integración y estado final
+
+El laboratorio se desarrolló en `erik/circuit-breaker` y se integró con el
+flujo acordado del repositorio:
+
+1. **PR #3:** [`erik/circuit-breaker` → `erik/practicas`](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/3) (mergeado).
+2. **PR #4:** [`erik/practicas` → `main`](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/4) (mergeado).
+
+El [PR directo #2](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/2)
+a `main` se cerró para respetar la integración por `erik/practicas`. El código
+y las evidencias finales están en `main`.
+
+Los 12 criterios de aceptación se verificaron: estructura en rama
+independiente, dos microservicios, PyBreaker, tres estados, pruebas, dos
+contenedores, demo reproducible, Terraform, ECS Fargate, evidencias,
+publicación en GitHub y eliminación de los recursos AWS.
 
 ## Arquitectura
 
@@ -315,9 +334,15 @@ cd terraform
 terraform destroy
 ```
 
-El `destroy` elimina únicamente los recursos de este estado. No modifica el
-cluster compartido, la VPC, las subredes ni `LabRole`. La salida real está en
-`evidencias/13-terraform-destroy.txt`.
+El `destroy` se ejecutó al finalizar la demostración y eliminó **7 recursos**.
+La verificación posterior confirmó:
+
+- servicio ECS `INACTIVE`, `desired=0`, `running=0`;
+- sin tareas, repositorios ECR, log groups ni Security Group del laboratorio;
+- clúster, VPC, subredes y `LabRole` compartidos intactos;
+- estado Terraform vacío.
+
+La salida completa está en `evidencias/13-terraform-destroy.txt`.
 
 ## Resultados reales
 
@@ -330,6 +355,27 @@ cluster compartido, la VPC, las subredes ni `LabRole`. La salida real está en
 - **Backend:** recibió 4 peticiones durante la fase de fallos (`1 ok`, `3 fail`),
   ninguna durante el rechazo y 1 más después de la recuperación (total 5).
 - **Transiciones observadas:** `closed → open → half-open → closed`.
+- **Limpieza:** 7/7 recursos destruidos; servicio ECS `INACTIVE`; sin restos
+  del laboratorio y con el lab04 intacto (`desired=0`).
+- **Integración:** PR #3 (`erik/circuit-breaker` → `erik/practicas`) y PR #4
+  (`erik/practicas` → `main`) mergeados.
+
+## Estado de aceptación
+
+| Criterio | Estado |
+|---|---|
+| Estructura en rama independiente | ✅ `erik/circuit-breaker` |
+| Dos microservicios FastAPI | ✅ |
+| Circuit Breaker con PyBreaker | ✅ |
+| Estados `CLOSED`, `OPEN` y `HALF-OPEN` | ✅ |
+| Pruebas automatizadas | ✅ 16/16 |
+| Dos contenedores Docker | ✅ |
+| Demostración reproducible con script | ✅ `scripts/demo.sh` |
+| Terraform validado y desplegado en AWS | ✅ |
+| Ejecución en ECS Fargate | ✅ |
+| Evidencias y diagramas | ✅ 01–13 |
+| Código publicado en GitHub | ✅ PR #3 y PR #4 |
+| Recursos AWS eliminados | ✅ 7 destruidos |
 
 ## Evidencias
 
@@ -344,10 +390,10 @@ cluster compartido, la VPC, las subredes ni `LabRole`. La salida real está en
 | `07-terraform-validate.txt` | `terraform validate` exitoso. |
 | `08-terraform-plan.txt` | Plan con 7 recursos. |
 | `09-terraform-apply.txt` | Apply completo y outputs. |
-| `10-ecs.png` | Servicio ECS en la consola de AWS. |
+| `10-ecs.png` | Captura real del servicio ECS (22-nov-2026 03:55 UTC). |
 | `11-aws-demo.txt` | Demo completa contra la tarea Fargate. |
 | `12-cloudwatch.txt` | Logs de cliente y backend en CloudWatch. |
-| `13-terraform-destroy.txt` | Destrucción de los recursos del laboratorio. |
+| `13-terraform-destroy.txt` | 7 recursos destruidos y verificación posterior sin restos. |
 
 El índice detallado está en `evidencias/README.md`.
 
