@@ -31,10 +31,6 @@ reales de su ejecución local y en AWS.
 | Erik | 01, 04, 05, 07 |
 | César | 02, 03, 06, 08 |
 
-El Laboratorio 01 estaba asignado originalmente a César. Para esta entrega,
-Erik asumió su implementación en una rama independiente, sin modificar el
-trabajo de César ni los laboratorios ya terminados.
-
 ## Laboratorio 01 — Circuit Breaker
 
 Implementación completa con dos microservicios FastAPI, PyBreaker, Docker
