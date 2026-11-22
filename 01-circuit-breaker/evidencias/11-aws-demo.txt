@@ -1,0 +1,69 @@
+Esperando a http://100.26.4.172:8000/health ...
+Cliente listo (intento 1)
+# 03 - Operacion normal (circuito CLOSED)
+URL base: http://100.26.4.172:8000
+
+$ curl -sS "http://100.26.4.172:8000/health"
+{"status":"ok","service":"client","breaker":"CLOSED"}
+
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://100.26.4.172:8000/request?scenario=ok"
+{"status":"ok","message":"Solicitud completada","breaker":"CLOSED","backend":{"status":"ok","message":"Trabajo completado","scenario":"ok"}}
+HTTP 200
+
+$ curl -sS "http://100.26.4.172:8000/breaker/status"
+{"state":"CLOSED","fail_counter":0,"success_counter":0,"fail_max":3,"reset_timeout":10,"success_threshold":1,"events":[]}
+
+$ curl -sS "http://100.26.4.172:8000/backend/stats"
+{"total":1,"ok":1,"fail":0}
+# 04 - Tres fallos consecutivos abren el circuito
+
+--- fallo 1 ---
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://100.26.4.172:8000/request?scenario=fail"
+{"error":"backend_failure","message":"backend devolvio HTTP 500","breaker":"CLOSED"}
+HTTP 502
+
+estado del circuito: CLOSED
+
+--- fallo 2 ---
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://100.26.4.172:8000/request?scenario=fail"
+{"error":"backend_failure","message":"backend devolvio HTTP 500","breaker":"CLOSED"}
+HTTP 502
+
+estado del circuito: CLOSED
+
+--- fallo 3 ---
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://100.26.4.172:8000/request?scenario=fail"
+{"error":"circuit_open","reason":"threshold_reached","breaker":"OPEN","detail":"Failures threshold reached, circuit breaker opened"}
+HTTP 503
+
+estado del circuito: OPEN
+
+$ curl -sS "http://100.26.4.172:8000/backend/stats"
+{"total":4,"ok":1,"fail":3}
+# 05 - Rechazo inmediato: el backend NO recibe la peticion
+
+peticiones al backend antes: 4
+
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://100.26.4.172:8000/request?scenario=ok"
+{"error":"circuit_open","reason":"timeout_not_elapsed","breaker":"OPEN","detail":"Timeout not elapsed yet, circuit breaker still open"}
+HTTP 503
+
+peticiones al backend despues: 4
+
+$ curl -sS "http://100.26.4.172:8000/breaker/status"
+{"state":"OPEN","fail_counter":3,"success_counter":0,"fail_max":3,"reset_timeout":10,"success_threshold":1,"events":[{"from":"closed","to":"open","at":"2026-11-22T03:35:33.327948+00:00","fail_counter":3}]}
+Esperando 11 segundos (reset_timeout=10 s) para la prueba HALF-OPEN ...
+# 06 - Recuperacion mediante HALF-OPEN
+
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://100.26.4.172:8000/request?scenario=ok"
+{"status":"ok","message":"Solicitud completada","breaker":"CLOSED","backend":{"status":"ok","message":"Trabajo completado","scenario":"ok"}}
+HTTP 200
+
+estado final del circuito: CLOSED
+
+$ curl -sS "http://100.26.4.172:8000/breaker/status"
+{"state":"CLOSED","fail_counter":0,"success_counter":0,"fail_max":3,"reset_timeout":10,"success_threshold":1,"events":[{"from":"closed","to":"open","at":"2026-11-22T03:35:33.327948+00:00","fail_counter":3},{"from":"open","to":"half-open","at":"2026-11-22T03:35:46.211825+00:00","fail_counter":3},{"from":"half-open","to":"closed","at":"2026-11-22T03:35:46.225932+00:00","fail_counter":0}]}
+
+$ curl -sS "http://100.26.4.172:8000/backend/stats"
+{"total":5,"ok":2,"fail":3}
+Demostracion completada. Evidencias en /tmp/lab01-aws-evidencias/
