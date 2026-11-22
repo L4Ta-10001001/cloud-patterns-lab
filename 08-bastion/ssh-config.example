@@ -1,0 +1,12 @@
+Host bastion-lab
+    HostName BASTION_PUBLIC_IP
+    User ec2-user
+    IdentityFile ~/Downloads/clave-lab-bastion.pem
+    IdentitiesOnly yes
+
+Host private-server
+    HostName 10.10.2.107
+    User ec2-user
+    IdentityFile ~/Downloads/clave-lab-bastion.pem
+    IdentitiesOnly yes
+    ProxyJump bastion-lab
