@@ -35,32 +35,6 @@ El Laboratorio 01 estaba asignado originalmente a César. Para esta entrega,
 Erik asumió su implementación en una rama independiente, sin modificar el
 trabajo de César ni los laboratorios ya terminados.
 
-## Integración en GitHub
-
-- `main` contiene el trabajo integrado y revisado.
-- Ramas de trabajo: `erik/practicas` y `cesar/practicas`.
-- Cada laboratorio se desarrolla en su propia carpeta y se integra mediante
-  Pull Requests.
-- Los laboratorios 04, 05 y 07 se integraron previamente mediante el PR #1.
-
-### Flujo del Laboratorio 01
-
-```text
-erik/circuit-breaker
-        │  PR #3
-        ▼
-erik/practicas
-        │  PR #4
-        ▼
-main
-```
-
-- **PR #3:** [`erik/circuit-breaker` → `erik/practicas`](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/3) (mergeado).
-- **PR #4:** [`erik/practicas` → `main`](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/4) (mergeado).
-- El [PR directo #2](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/2)
-  (`erik/circuit-breaker` → `main`) se cerró para respetar el flujo de
-  integración por `erik/practicas`.
-
 ## Laboratorio 01 — Circuit Breaker
 
 Implementación completa con dos microservicios FastAPI, PyBreaker, Docker
