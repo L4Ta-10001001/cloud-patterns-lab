@@ -8,3 +8,10 @@ image_tag  = "v1"
 
 # En el segundo despliegue cambiar por TU IPv4 publica /32.
 allowed_cidr = "127.0.0.1/32"
+
+# Opcional: numero de tareas Fargate. Null = 2 con ALB / 1 sin ALB.
+# desired_count = 0   # detiene la tarea sin destruir el servicio (ahorro de costos).
+
+# Laboratorio 05 (API Gateway + ALB + reverse proxy):
+# enable_lab05     = true
+# enable_lab05_alb = true

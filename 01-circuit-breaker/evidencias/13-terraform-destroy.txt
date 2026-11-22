@@ -1,0 +1,345 @@
+data.aws_ecs_cluster.lab: Reading...
+data.aws_iam_role.lab: Reading...
+data.aws_vpc.lab: Reading...
+aws_cloudwatch_log_group.client: Refreshing state... [id=/ecs/cloudlab-erik-lab01-client]
+aws_ecr_repository.backend: Refreshing state... [id=cloudlab-erik-lab01-backend]
+aws_ecr_repository.client: Refreshing state... [id=cloudlab-erik-lab01-client]
+aws_cloudwatch_log_group.backend: Refreshing state... [id=/ecs/cloudlab-erik-lab01-backend]
+data.aws_iam_role.lab: Read complete after 0s [id=LabRole]
+data.aws_ecs_cluster.lab: Read complete after 0s [id=arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-cluster]
+aws_ecs_task_definition.lab: Refreshing state... [id=cloudlab-erik-lab01-circuit-breaker]
+data.aws_vpc.lab: Read complete after 1s [id=vpc-08d0c468757d531f6]
+data.aws_subnets.public: Reading...
+aws_security_group.lab: Refreshing state... [id=sg-0bb0b65df9fe58b2f]
+data.aws_subnets.public: Read complete after 0s [id=us-east-1]
+aws_ecs_service.lab: Refreshing state... [id=arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-cluster/cloudlab-erik-lab01-circuit-breaker]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_cloudwatch_log_group.backend will be destroyed
+  - resource "aws_cloudwatch_log_group" "backend" {
+      - arn                         = "arn:aws:logs:us-east-1:533267299755:log-group:/ecs/cloudlab-erik-lab01-backend" -> null
+      - deletion_protection_enabled = false -> null
+      - id                          = "/ecs/cloudlab-erik-lab01-backend" -> null
+      - log_group_class             = "STANDARD" -> null
+      - name                        = "/ecs/cloudlab-erik-lab01-backend" -> null
+      - region                      = "us-east-1" -> null
+      - retention_in_days           = 3 -> null
+      - skip_destroy                = false -> null
+      - tags                        = {} -> null
+      - tags_all                    = {} -> null
+        # (2 unchanged attributes hidden)
+    }
+
+  # aws_cloudwatch_log_group.client will be destroyed
+  - resource "aws_cloudwatch_log_group" "client" {
+      - arn                         = "arn:aws:logs:us-east-1:533267299755:log-group:/ecs/cloudlab-erik-lab01-client" -> null
+      - deletion_protection_enabled = false -> null
+      - id                          = "/ecs/cloudlab-erik-lab01-client" -> null
+      - log_group_class             = "STANDARD" -> null
+      - name                        = "/ecs/cloudlab-erik-lab01-client" -> null
+      - region                      = "us-east-1" -> null
+      - retention_in_days           = 3 -> null
+      - skip_destroy                = false -> null
+      - tags                        = {} -> null
+      - tags_all                    = {} -> null
+        # (2 unchanged attributes hidden)
+    }
+
+  # aws_ecr_repository.backend will be destroyed
+  - resource "aws_ecr_repository" "backend" {
+      - arn                  = "arn:aws:ecr:us-east-1:533267299755:repository/cloudlab-erik-lab01-backend" -> null
+      - force_delete         = true -> null
+      - id                   = "cloudlab-erik-lab01-backend" -> null
+      - image_tag_mutability = "MUTABLE" -> null
+      - name                 = "cloudlab-erik-lab01-backend" -> null
+      - region               = "us-east-1" -> null
+      - registry_id          = "533267299755" -> null
+      - repository_url       = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-lab01-backend" -> null
+      - tags                 = {} -> null
+      - tags_all             = {} -> null
+
+      - encryption_configuration {
+          - encryption_type = "AES256" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - image_scanning_configuration {
+          - scan_on_push = false -> null
+        }
+    }
+
+  # aws_ecr_repository.client will be destroyed
+  - resource "aws_ecr_repository" "client" {
+      - arn                  = "arn:aws:ecr:us-east-1:533267299755:repository/cloudlab-erik-lab01-client" -> null
+      - force_delete         = true -> null
+      - id                   = "cloudlab-erik-lab01-client" -> null
+      - image_tag_mutability = "MUTABLE" -> null
+      - name                 = "cloudlab-erik-lab01-client" -> null
+      - region               = "us-east-1" -> null
+      - registry_id          = "533267299755" -> null
+      - repository_url       = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-lab01-client" -> null
+      - tags                 = {} -> null
+      - tags_all             = {} -> null
+
+      - encryption_configuration {
+          - encryption_type = "AES256" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - image_scanning_configuration {
+          - scan_on_push = false -> null
+        }
+    }
+
+  # aws_ecs_service.lab will be destroyed
+  - resource "aws_ecs_service" "lab" {
+      - arn                                = "arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-cluster/cloudlab-erik-lab01-circuit-breaker" -> null
+      - availability_zone_rebalancing      = "ENABLED" -> null
+      - cluster                            = "arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-cluster" -> null
+      - deployment_maximum_percent         = 200 -> null
+      - deployment_minimum_healthy_percent = 100 -> null
+      - desired_count                      = 1 -> null
+      - enable_ecs_managed_tags            = false -> null
+      - enable_execute_command             = false -> null
+      - health_check_grace_period_seconds  = 0 -> null
+      - iam_role                           = "/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS" -> null
+      - id                                 = "arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-cluster/cloudlab-erik-lab01-circuit-breaker" -> null
+      - launch_type                        = "FARGATE" -> null
+      - name                               = "cloudlab-erik-lab01-circuit-breaker" -> null
+      - platform_version                   = "LATEST" -> null
+      - propagate_tags                     = "NONE" -> null
+      - region                             = "us-east-1" -> null
+      - scheduling_strategy                = "REPLICA" -> null
+      - tags                               = {} -> null
+      - tags_all                           = {} -> null
+      - task_definition                    = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-lab01-circuit-breaker:1" -> null
+      - triggers                           = {} -> null
+      - wait_for_steady_state              = false -> null
+
+      - deployment_circuit_breaker {
+          - enable   = false -> null
+          - rollback = false -> null
+        }
+
+      - deployment_configuration {
+          - bake_time_in_minutes = "0" -> null
+          - strategy             = "ROLLING" -> null
+        }
+
+      - deployment_controller {
+          - type = "ECS" -> null
+        }
+
+      - network_configuration {
+          - assign_public_ip = true -> null
+          - security_groups  = [
+              - "sg-0bb0b65df9fe58b2f",
+            ] -> null
+          - subnets          = [
+              - "subnet-0616ec95dfba25c73",
+              - "subnet-06ffe2447f2f7c28b",
+            ] -> null
+        }
+    }
+
+  # aws_ecs_task_definition.lab will be destroyed
+  - resource "aws_ecs_task_definition" "lab" {
+      - arn                      = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-lab01-circuit-breaker:1" -> null
+      - arn_without_revision     = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-lab01-circuit-breaker" -> null
+      - container_definitions    = jsonencode(
+            [
+              - {
+                  - environment      = []
+                  - essential        = true
+                  - image            = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-lab01-backend:v1"
+                  - logConfiguration = {
+                      - logDriver = "awslogs"
+                      - options   = {
+                          - awslogs-group         = "/ecs/cloudlab-erik-lab01-backend"
+                          - awslogs-region        = "us-east-1"
+                          - awslogs-stream-prefix = "backend"
+                        }
+                    }
+                  - mountPoints      = []
+                  - name             = "backend"
+                  - portMappings     = [
+                      - {
+                          - containerPort = 8001
+                          - hostPort      = 8001
+                          - protocol      = "tcp"
+                        },
+                    ]
+                  - systemControls   = []
+                  - volumesFrom      = []
+                },
+              - {
+                  - dependsOn        = [
+                      - {
+                          - condition     = "START"
+                          - containerName = "backend"
+                        },
+                    ]
+                  - environment      = [
+                      - {
+                          - name  = "BACKEND_URL"
+                          - value = "http://127.0.0.1:8001"
+                        },
+                    ]
+                  - essential        = true
+                  - image            = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-lab01-client:v1"
+                  - logConfiguration = {
+                      - logDriver = "awslogs"
+                      - options   = {
+                          - awslogs-group         = "/ecs/cloudlab-erik-lab01-client"
+                          - awslogs-region        = "us-east-1"
+                          - awslogs-stream-prefix = "client"
+                        }
+                    }
+                  - mountPoints      = []
+                  - name             = "client"
+                  - portMappings     = [
+                      - {
+                          - containerPort = 8000
+                          - hostPort      = 8000
+                          - protocol      = "tcp"
+                        },
+                    ]
+                  - systemControls   = []
+                  - volumesFrom      = []
+                },
+            ]
+        ) -> null
+      - cpu                      = "512" -> null
+      - enable_fault_injection   = false -> null
+      - execution_role_arn       = "arn:aws:iam::533267299755:role/LabRole" -> null
+      - family                   = "cloudlab-erik-lab01-circuit-breaker" -> null
+      - id                       = "cloudlab-erik-lab01-circuit-breaker" -> null
+      - memory                   = "1024" -> null
+      - network_mode             = "awsvpc" -> null
+      - region                   = "us-east-1" -> null
+      - requires_compatibilities = [
+          - "FARGATE",
+        ] -> null
+      - revision                 = 1 -> null
+      - skip_destroy             = false -> null
+      - tags                     = {} -> null
+      - tags_all                 = {} -> null
+      - task_role_arn            = "arn:aws:iam::533267299755:role/LabRole" -> null
+      - track_latest             = false -> null
+        # (2 unchanged attributes hidden)
+    }
+
+  # aws_security_group.lab will be destroyed
+  - resource "aws_security_group" "lab" {
+      - arn                    = "arn:aws:ec2:us-east-1:533267299755:security-group/sg-0bb0b65df9fe58b2f" -> null
+      - description            = "Acceso HTTP al cliente del laboratorio 01" -> null
+      - egress                 = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - description      = "Salida para ECR, CloudWatch y backend local"
+              - from_port        = 0
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+            },
+        ] -> null
+      - id                     = "sg-0bb0b65df9fe58b2f" -> null
+      - ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "157.100.142.229/32",
+                ]
+              - description      = "Cliente Circuit Breaker desde IP autorizada"
+              - from_port        = 8000
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "tcp"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 8000
+            },
+        ] -> null
+      - name                   = "cloudlab-erik-lab01-sg" -> null
+      - owner_id               = "533267299755" -> null
+      - region                 = "us-east-1" -> null
+      - revoke_rules_on_delete = false -> null
+      - tags                   = {
+          - "Name" = "cloudlab-erik-lab01-sg"
+        } -> null
+      - tags_all               = {
+          - "Name" = "cloudlab-erik-lab01-sg"
+        } -> null
+      - vpc_id                 = "vpc-08d0c468757d531f6" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 0 to change, 7 to destroy.
+
+Changes to Outputs:
+  - backend_repository_url = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-lab01-backend" -> null
+  - client_repository_url  = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-lab01-client" -> null
+  - cluster_name           = "cloudlab-erik-cluster" -> null
+  - security_group_id      = "sg-0bb0b65df9fe58b2f" -> null
+  - service_name           = "cloudlab-erik-lab01-circuit-breaker" -> null
+  - task_family            = "cloudlab-erik-lab01-circuit-breaker" -> null
+aws_ecs_service.lab: Destroying... [id=arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-cluster/cloudlab-erik-lab01-circuit-breaker]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 00m10s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 00m20s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 00m30s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 00m40s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 00m50s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 01m00s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 01m10s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 01m20s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 01m30s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 01m40s elapsed]
+aws_ecs_service.lab: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...er/cloudlab-erik-lab01-circuit-breaker, 01m50s elapsed]
+aws_ecs_service.lab: Destruction complete after 1m51s
+aws_security_group.lab: Destroying... [id=sg-0bb0b65df9fe58b2f]
+aws_ecs_task_definition.lab: Destroying... [id=cloudlab-erik-lab01-circuit-breaker]
+aws_ecs_task_definition.lab: Destruction complete after 0s
+aws_ecr_repository.backend: Destroying... [id=cloudlab-erik-lab01-backend]
+aws_cloudwatch_log_group.backend: Destroying... [id=/ecs/cloudlab-erik-lab01-backend]
+aws_cloudwatch_log_group.client: Destroying... [id=/ecs/cloudlab-erik-lab01-client]
+aws_ecr_repository.client: Destroying... [id=cloudlab-erik-lab01-client]
+aws_cloudwatch_log_group.backend: Destruction complete after 0s
+aws_cloudwatch_log_group.client: Destruction complete after 0s
+aws_ecr_repository.backend: Destruction complete after 1s
+aws_ecr_repository.client: Destruction complete after 1s
+aws_security_group.lab: Destruction complete after 1s
+
+Destroy complete! Resources: 7 destroyed.
+
+=== Verificación posterior con AWS CLI ===
+
+Servicio ECS lab01 (status / desired / running):
+INACTIVE	0	0
+
+Tareas lab01 (debe estar vacío):
+
+Repositorios ECR restantes:
+cloudlab-erik-api
+
+Log groups del laboratorio 01 (debe estar vacío):
+
+Security group del laboratorio 01 (debe no existir):
+
+aws: [ERROR]: An error occurred (InvalidGroup.NotFound) when calling the DescribeSecurityGroups operation: The security group 'sg-0bb0b65df9fe58b2f' does not exist
+
+Cluster compartido (debe seguir ACTIVE):
+cloudlab-erik-cluster	ACTIVE
+
+Servicio del laboratorio 04 (debe seguir ACTIVE con desired=0):
+ACTIVE	0	0
+
+Estado Terraform restante (debe estar vacío):

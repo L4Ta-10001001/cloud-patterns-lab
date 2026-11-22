@@ -149,7 +149,7 @@ resource "aws_ecs_service" "api" {
   name            = "${var.project_prefix}-api"
   cluster         = aws_ecs_cluster.demo.id
   task_definition = aws_ecs_task_definition.api[0].arn
-  desired_count   = var.enable_lab05_alb ? 2 : 1
+  desired_count   = coalesce(var.desired_count, var.enable_lab05_alb ? 2 : 1)
   launch_type     = "FARGATE"
 
   network_configuration {
