@@ -1,0 +1,25 @@
+# Ajuste de CIDR por doble IP de salida en la red del laboratorio
+
+$ curl -4 https://checkip.amazonaws.com
+157.100.142.229   # IP vista por HTTPS (proxy)
+
+$ ss -tn | grep ":22 "   # ejecutado dentro de la EC2
+ESTAB 0 216 10.70.1.122:22 181.199.46.145:43082   # IP real del trafico SSH
+
+# terraform.tfvars final:
+  allowed_cidr      = "181.199.46.145/32"
+  http_allowed_cidr = "157.100.142.229/32"
+
+# SG resultante (aws ec2 describe-security-groups):
+  22:   181.199.46.145/32
+  8080: 157.100.142.229/32
+
+# Verificacion final:
+$ curl -sS -i http://3.235.42.178:8080/health
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.12.3
+Date: Sat, 21 Nov 2026 06:24:01 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 16
+
+{"status": "ok"}

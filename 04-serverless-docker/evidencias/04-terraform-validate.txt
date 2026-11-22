@@ -1,0 +1,16 @@
+$ terraform fmt -check && terraform validate
+Success! The configuration is valid.
+
+$ terraform plan -no-color | tail -12
+aws_subnet.public[0]: Refreshing state... [id=subnet-0616ec95dfba25c73]
+aws_vpc_security_group_egress_rule.ecs_outbound[0]: Refreshing state... [id=sgr-051b4c909f4c78b25]
+aws_vpc_security_group_ingress_rule.ecs_http[0]: Refreshing state... [id=sgr-0548a6856477ec530]
+aws_route_table.public[0]: Refreshing state... [id=rtb-06a3fa3e519b63329]
+aws_route_table_association.public[0]: Refreshing state... [id=rtbassoc-08ad164195c946289]
+aws_route_table_association.public[1]: Refreshing state... [id=rtbassoc-08efc9a6b260c075c]
+aws_ecs_service.api[0]: Refreshing state... [id=arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-cluster/cloudlab-erik-api]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

@@ -1,0 +1,3 @@
+$ ssh ubuntu@onprem-legacy-server "systemctl is-active legacyapp; sha256sum /opt/legacyapp/server.py"
+active
+03b47adf2f62b2ebe85bfd0c91899c199dd63243df95d635fa6ac407c1ed8230  /opt/legacyapp/server.py

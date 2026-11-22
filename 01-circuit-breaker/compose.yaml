@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: ./backend
+    container_name: lab01-backend
+    networks:
+      - lab01
+    expose:
+      - "8001"
+
+  client:
+    build: ./client
+    container_name: lab01-client
+    environment:
+      BACKEND_URL: http://backend:8001
+    ports:
+      - "127.0.0.1:8091:8000"
+    depends_on:
+      - backend
+    networks:
+      - lab01
+
+networks:
+  lab01:
+    driver: bridge

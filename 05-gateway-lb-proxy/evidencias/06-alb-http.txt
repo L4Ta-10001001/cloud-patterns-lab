@@ -1,0 +1,18 @@
+$ curl -i http://cloudlab-erik-alb-729776504.us-east-1.elb.amazonaws.com/health
+HTTP/1.1 200 OK
+Date: Sat, 21 Nov 2026 05:28:42 GMT
+Content-Type: application/json
+Content-Length: 15
+Connection: keep-alive
+server: uvicorn
+
+{"status":"ok"}
+$ curl -i http://cloudlab-erik-alb-729776504.us-east-1.elb.amazonaws.com/
+HTTP/1.1 200 OK
+Date: Sat, 21 Nov 2026 05:28:42 GMT
+Content-Type: application/json
+Content-Length: 97
+Connection: keep-alive
+server: uvicorn
+
+{"message":"Hola desde la API de contenedores","runtime":"docker","project":"cloud-patterns-lab"}

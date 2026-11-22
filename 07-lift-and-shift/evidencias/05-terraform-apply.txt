@@ -1,0 +1,27 @@
+aws_key_pair.migration[0]: Creating...
+aws_vpc.lab07: Creating...
+aws_key_pair.migration[0]: Creation complete after 1s [id=cloudlab-erik-lab07-key]
+aws_vpc.lab07: Creation complete after 3s [id=vpc-09787558fff7087f9]
+aws_internet_gateway.public: Creating...
+aws_subnet.public: Creating...
+aws_security_group.ec2: Creating...
+aws_internet_gateway.public: Creation complete after 1s [id=igw-037f94cfd0159b601]
+aws_route_table.public: Creating...
+aws_route_table.public: Creation complete after 1s [id=rtb-0616bc5f345e6a977]
+aws_security_group.ec2: Creation complete after 4s [id=sg-052565823188ec8de]
+aws_subnet.public: Still creating... [00m10s elapsed]
+aws_subnet.public: Creation complete after 11s [id=subnet-0f47073e92a9e98ff]
+aws_route_table_association.public: Creating...
+aws_route_table_association.public: Creation complete after 1s [id=rtbassoc-09330e853f8580d50]
+aws_instance.migration: Creating...
+aws_instance.migration: Still creating... [00m10s elapsed]
+aws_instance.migration: Creation complete after 14s [id=i-03175f428ac57d526]
+
+Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+health_url = "http://3.235.42.178:8080/health"
+instance_id = "i-03175f428ac57d526"
+instance_public_ip = "3.235.42.178"
+ssh_command = "ssh -i ~/.ssh/cloudlab-liftshift ubuntu@3.235.42.178"

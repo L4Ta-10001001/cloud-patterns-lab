@@ -1,0 +1,21 @@
+aws_instance.migration: Destroying... [id=i-03175f428ac57d526]
+aws_instance.migration: Still destroying... [id=i-03175f428ac57d526, 00m10s elapsed]
+aws_instance.migration: Still destroying... [id=i-03175f428ac57d526, 00m20s elapsed]
+aws_instance.migration: Still destroying... [id=i-03175f428ac57d526, 00m30s elapsed]
+aws_instance.migration: Destruction complete after 31s
+aws_key_pair.migration[0]: Destroying... [id=cloudlab-erik-lab07-key]
+aws_route_table_association.public: Destroying... [id=rtbassoc-09330e853f8580d50]
+aws_security_group.ec2: Destroying... [id=sg-052565823188ec8de]
+aws_key_pair.migration[0]: Destruction complete after 0s
+aws_route_table_association.public: Destruction complete after 0s
+aws_subnet.public: Destroying... [id=subnet-0f47073e92a9e98ff]
+aws_route_table.public: Destroying... [id=rtb-0616bc5f345e6a977]
+aws_security_group.ec2: Destruction complete after 1s
+aws_subnet.public: Destruction complete after 1s
+aws_route_table.public: Destruction complete after 1s
+aws_internet_gateway.public: Destroying... [id=igw-037f94cfd0159b601]
+aws_internet_gateway.public: Destruction complete after 1s
+aws_vpc.lab07: Destroying... [id=vpc-09787558fff7087f9]
+aws_vpc.lab07: Destruction complete after 1s
+
+Apply complete! Resources: 0 added, 0 changed, 8 destroyed.

@@ -1,0 +1,13 @@
+# 06 - Recuperacion mediante HALF-OPEN
+
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://127.0.0.1:8091/request?scenario=ok"
+{"status":"ok","message":"Solicitud completada","breaker":"CLOSED","backend":{"status":"ok","message":"Trabajo completado","scenario":"ok"}}
+HTTP 200
+
+estado final del circuito: CLOSED
+
+$ curl -sS "http://127.0.0.1:8091/breaker/status"
+{"state":"CLOSED","fail_counter":0,"success_counter":0,"fail_max":3,"reset_timeout":10,"success_threshold":1,"events":[{"from":"closed","to":"open","at":"2026-11-22T03:30:25.503706+00:00","fail_counter":3},{"from":"open","to":"half-open","at":"2026-11-22T03:30:36.872900+00:00","fail_counter":3},{"from":"half-open","to":"closed","at":"2026-11-22T03:30:36.912904+00:00","fail_counter":0}]}
+
+$ curl -sS "http://127.0.0.1:8091/backend/stats"
+{"total":5,"ok":2,"fail":3}

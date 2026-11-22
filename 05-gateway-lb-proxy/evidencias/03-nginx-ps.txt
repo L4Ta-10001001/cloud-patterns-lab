@@ -1,0 +1,5 @@
+$ docker compose ps
+NAME                          IMAGE                       COMMAND                  SERVICE   CREATED          STATUS          PORTS
+05-gateway-lb-proxy-api_a-1   05-gateway-lb-proxy-api_a   "uvicorn app.main:ap…"   api_a     32 seconds ago   Up 30 seconds   8080/tcp
+05-gateway-lb-proxy-api_b-1   05-gateway-lb-proxy-api_b   "uvicorn app.main:ap…"   api_b     32 seconds ago   Up 31 seconds   8080/tcp
+05-gateway-lb-proxy-proxy-1   nginx:stable-alpine         "/docker-entrypoint.…"   proxy     31 seconds ago   Up 30 seconds   127.0.0.1:8090->80/tcp

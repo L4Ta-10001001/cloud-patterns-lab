@@ -1,0 +1,21 @@
+[Unit]
+Description=Legacy Demo Application (rehost without application changes)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=legacyapp
+Group=legacyapp
+WorkingDirectory=/opt/legacyapp
+ExecStart=/usr/bin/python3 /opt/legacyapp/server.py
+Restart=on-failure
+RestartSec=2
+Environment=PYTHONUNBUFFERED=1
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

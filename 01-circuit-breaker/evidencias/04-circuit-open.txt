@@ -1,0 +1,25 @@
+# 04 - Tres fallos consecutivos abren el circuito
+
+--- fallo 1 ---
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://127.0.0.1:8091/request?scenario=fail"
+{"error":"backend_failure","message":"backend devolvio HTTP 500","breaker":"CLOSED"}
+HTTP 502
+
+estado del circuito: CLOSED
+
+--- fallo 2 ---
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://127.0.0.1:8091/request?scenario=fail"
+{"error":"backend_failure","message":"backend devolvio HTTP 500","breaker":"CLOSED"}
+HTTP 502
+
+estado del circuito: CLOSED
+
+--- fallo 3 ---
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://127.0.0.1:8091/request?scenario=fail"
+{"error":"circuit_open","reason":"threshold_reached","breaker":"OPEN","detail":"Failures threshold reached, circuit breaker opened"}
+HTTP 503
+
+estado del circuito: OPEN
+
+$ curl -sS "http://127.0.0.1:8091/backend/stats"
+{"total":4,"ok":1,"fail":3}

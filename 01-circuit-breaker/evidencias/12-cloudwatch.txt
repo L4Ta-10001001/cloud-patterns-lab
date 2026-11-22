@@ -1,0 +1,49 @@
+# CloudWatch Logs - Laboratorio 01
+
+## /ecs/cloudlab-erik-lab01-client
+2026-11-22T03:34:32 INFO:     Started server process [1]
+2026-11-22T03:34:32 INFO:     Waiting for application startup.
+2026-11-22T03:34:32 INFO:     Application startup complete.
+2026-11-22T03:34:32 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-11-22T03:35:20 INFO:     157.100.142.229:14892 - "GET /health HTTP/1.1" 200 OK
+2026-11-22T03:35:31 INFO:     157.100.142.229:14854 - "GET /health HTTP/1.1" 200 OK
+2026-11-22T03:35:31 INFO:     157.100.142.229:14934 - "GET /health HTTP/1.1" 200 OK
+2026-11-22T03:35:31 INFO:     157.100.142.229:14868 - "GET /request?scenario=ok HTTP/1.1" 200 OK
+2026-11-22T03:35:32 INFO:     157.100.142.229:14869 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:32 INFO:     157.100.142.229:14952 - "GET /backend/stats HTTP/1.1" 200 OK
+2026-11-22T03:35:32 INFO:     157.100.142.229:14894 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:32 INFO:     157.100.142.229:14974 - "GET /request?scenario=fail HTTP/1.1" 502 Bad Gateway
+2026-11-22T03:35:32 INFO:     157.100.142.229:14912 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:32 INFO:     157.100.142.229:14848 - "GET /request?scenario=fail HTTP/1.1" 502 Bad Gateway
+2026-11-22T03:35:33 INFO:     157.100.142.229:14914 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:33 INFO:     157.100.142.229:14916 - "GET /request?scenario=fail HTTP/1.1" 503 Service Unavailable
+2026-11-22T03:35:33 INFO:     157.100.142.229:14948 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:33 INFO:     157.100.142.229:14950 - "GET /backend/stats HTTP/1.1" 200 OK
+2026-11-22T03:35:33 INFO:     157.100.142.229:14956 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:34 INFO:     157.100.142.229:14918 - "GET /backend/stats HTTP/1.1" 200 OK
+2026-11-22T03:35:34 INFO:     157.100.142.229:14954 - "GET /request?scenario=ok HTTP/1.1" 503 Service Unavailable
+2026-11-22T03:35:34 INFO:     157.100.142.229:14920 - "GET /backend/stats HTTP/1.1" 200 OK
+2026-11-22T03:35:34 INFO:     157.100.142.229:14921 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:34 INFO:     157.100.142.229:14851 - "GET /backend/stats HTTP/1.1" 200 OK
+2026-11-22T03:35:46 INFO:     157.100.142.229:14850 - "GET /request?scenario=ok HTTP/1.1" 200 OK
+2026-11-22T03:35:46 INFO:     157.100.142.229:14949 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:46 INFO:     157.100.142.229:14872 - "GET /breaker/status HTTP/1.1" 200 OK
+2026-11-22T03:35:46 INFO:     157.100.142.229:14880 - "GET /backend/stats HTTP/1.1" 200 OK
+2026-11-22T03:35:47 INFO:     157.100.142.229:14876 - "GET /breaker/status HTTP/1.1" 200 OK
+
+## /ecs/cloudlab-erik-lab01-backend
+2026-11-22T03:34:31 INFO:     Started server process [1]
+2026-11-22T03:34:31 INFO:     Waiting for application startup.
+2026-11-22T03:34:31 INFO:     Application startup complete.
+2026-11-22T03:34:31 INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+2026-11-22T03:35:31 INFO:     127.0.0.1:33942 - "GET /work?scenario=ok HTTP/1.1" 200 OK
+2026-11-22T03:35:32 INFO:     127.0.0.1:33946 - "GET /stats HTTP/1.1" 200 OK
+2026-11-22T03:35:32 INFO:     127.0.0.1:33958 - "GET /work?scenario=fail HTTP/1.1" 500 Internal Server Error
+2026-11-22T03:35:32 INFO:     127.0.0.1:33970 - "GET /work?scenario=fail HTTP/1.1" 500 Internal Server Error
+2026-11-22T03:35:33 INFO:     127.0.0.1:33974 - "GET /work?scenario=fail HTTP/1.1" 500 Internal Server Error
+2026-11-22T03:35:33 INFO:     127.0.0.1:50886 - "GET /stats HTTP/1.1" 200 OK
+2026-11-22T03:35:34 INFO:     127.0.0.1:50888 - "GET /stats HTTP/1.1" 200 OK
+2026-11-22T03:35:34 INFO:     127.0.0.1:50890 - "GET /stats HTTP/1.1" 200 OK
+2026-11-22T03:35:34 INFO:     127.0.0.1:50902 - "GET /stats HTTP/1.1" 200 OK
+2026-11-22T03:35:46 INFO:     127.0.0.1:56194 - "GET /work?scenario=ok HTTP/1.1" 200 OK
+2026-11-22T03:35:46 INFO:     127.0.0.1:56202 - "GET /stats HTTP/1.1" 200 OK

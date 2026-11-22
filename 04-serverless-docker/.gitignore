@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+.pytest_cache/
+evidencias/*.json
+!evidencias/05-lambda-invoke.json
+evidencias/*.log
+*.pem
+.env

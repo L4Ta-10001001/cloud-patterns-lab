@@ -1,0 +1,9 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
+*.tfplan
+tfplan
+lambda-package.zip
+crash.log

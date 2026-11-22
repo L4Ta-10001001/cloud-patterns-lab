@@ -1,0 +1,6 @@
+$ curl -w "HTTP %{http_code}\n" http://127.0.0.1:8080/health
+{"status":"ok"}
+HTTP 200
+$ curl -w "HTTP %{http_code}\n" http://127.0.0.1:8080/
+{"message":"Hola desde la API de contenedores","runtime":"docker","project":"cloud-patterns-lab"}
+HTTP 200

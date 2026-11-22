@@ -1,0 +1,16 @@
+$ curl -i https://apm370rtne.execute-api.us-east-1.amazonaws.com/health
+HTTP/2 200 
+date: Sat, 21 Nov 2026 05:24:08 GMT
+content-type: application/json
+content-length: 16
+apigw-requestid: HLOm5jw_IAMEMGQ=
+
+{"status": "ok"}
+$ curl -i https://apm370rtne.execute-api.us-east-1.amazonaws.com/
+HTTP/2 200 
+date: Sat, 21 Nov 2026 05:24:09 GMT
+content-type: application/json
+content-length: 90
+apigw-requestid: HLOm_ilHIAMEYxw=
+
+{"message": "Hola desde AWS Lambda", "runtime": "lambda", "project": "cloud-patterns-lab"}

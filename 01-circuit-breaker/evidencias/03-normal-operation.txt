@@ -1,0 +1,15 @@
+# 03 - Operacion normal (circuito CLOSED)
+URL base: http://127.0.0.1:8091
+
+$ curl -sS "http://127.0.0.1:8091/health"
+{"status":"ok","service":"client","breaker":"CLOSED"}
+
+$ curl -sS -w '\nHTTP %{http_code}\n' "http://127.0.0.1:8091/request?scenario=ok"
+{"status":"ok","message":"Solicitud completada","breaker":"CLOSED","backend":{"status":"ok","message":"Trabajo completado","scenario":"ok"}}
+HTTP 200
+
+$ curl -sS "http://127.0.0.1:8091/breaker/status"
+{"state":"CLOSED","fail_counter":0,"success_counter":0,"fail_max":3,"reset_timeout":10,"success_threshold":1,"events":[]}
+
+$ curl -sS "http://127.0.0.1:8091/backend/stats"
+{"total":1,"ok":1,"fail":0}
