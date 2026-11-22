@@ -35,7 +35,7 @@ flowchart LR
    private subnet. Its address is `10.10.2.107`. The screenshot below shows
    a dash in the public IPv4 field because this instance has no public IP.
 
-![Private EC2 instance showing its private address and empty public IPv4 field](images/01-private-instance.png)
+![Private EC2 instance showing its private address and empty public IPv4 field](Images/01-private-instance.png)
 
 ## Who can connect?
 
@@ -50,7 +50,7 @@ The lab uses two groups because each server accepts SSH from a different source.
 The screenshot below shows the private server's inbound rule. The `sg-...`
 value in the source field identifies the bastion's security group.
 
-![Private server rule allowing SSH from the bastion security group](images/02-ssh-rule.png)
+![Private server rule allowing SSH from the bastion security group](Images/02-ssh-rule.png)
 
 ## How to test the connection
 
@@ -89,7 +89,7 @@ arrived: the private server received it from the bastion (`10.10.1.96`)
 on SSH port `22`. The number `58716` was the temporary source port for
 this session and may change on the next connection.
 
-![Terminal showing the private server name, address and SSH connection](images/03-ssh-test.png)
+![Terminal showing the private server name, address and SSH connection](Images/03-ssh-test.png)
 
 ## Possible use in AlergoAssist
 
