@@ -1,0 +1,9 @@
+# Copiar a terraform.tfvars y reemplazar allowed_cidr por tu IPv4 real:
+#   curl -4 https://checkip.amazonaws.com
+aws_region       = "us-east-1"
+project_prefix   = "cloudlab-erik"
+allowed_cidr     = "198.51.100.7/32" # EJEMPLO: reemplazar
+vpc_name         = "cloudlab-erik-vpc"
+ecs_cluster_name = "cloudlab-erik-cluster"
+execution_role_name = "LabRole"
+image_tag        = "v1"
