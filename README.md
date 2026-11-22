@@ -1,107 +1,172 @@
 # Cloud Architecture and Design Patterns
 
-Trabajo práctico de **Programación Distribuida** — implementaciones simples y
-verificables de patrones y servicios cloud sobre AWS, con Terraform como
-herramienta de aprovisionamiento.
-
-Repositorio: `git@github.com:L4Ta-10001001/cloud-patterns-lab.git`
-Rama de trabajo de Erik: `erik/practicas`
+Laboratorio de investigación y práctica de patrones de arquitectura cloud para
+la asignatura **Programación Distribuida**.
 
 ## Objetivo
 
-Investigar y demostrar patrones de arquitectura cloud mediante implementaciones
-pequeñas que puedan ejecutarse, probarse y explicarse con evidencia real.
-Cada laboratorio incluye descripción, arquitectura, código, instrucciones de
-ejecución y resultados (logs, capturas o pruebas).
+Investigar y demostrar patrones de arquitectura cloud mediante
+implementaciones funcionales, reproducibles y documentadas, con evidencias
+reales de su ejecución local y en AWS.
 
-## Equipo
+## Estado actual
 
-| Integrante | Laboratorios asignados |
-| ---------- | ---------------------- |
-| César      | 01, 02, 03, 06, 08     |
-| Erik       | 04, 05, 07             |
+**4 de 8 laboratorios completados.**
 
-## Estado de los laboratorios
+| Lab | Tema | Responsable | Estado | Documentación |
+|---|---|---|---|---|
+| 01 | Circuit Breaker | Erik | ✅ Completado | [README](01-circuit-breaker/README.md) |
+| 02 | Retry | César | ⏳ Pendiente | [README](02-retry/README.md) |
+| 03 | Timeout | César | ⏳ Pendiente | [README](03-timeout/README.md) |
+| 04 | Serverless y contenedores | Erik | ✅ Completado | [README](04-serverless-docker/README.md) |
+| 05 | API Gateway, ALB y reverse proxy | Erik | ✅ Completado | [README](05-gateway-lb-proxy/README.md) |
+| 06 | Hub-and-Spoke | César | ⏳ Pendiente | [README](06-hub-and-spoke/README.md) |
+| 07 | Lift-and-Shift | Erik | ✅ Completado | [README](07-lift-and-shift/README.md) |
+| 08 | Bastion Host | César | ⏳ Pendiente | [README](08-bastion/README.md) |
 
-| # | Laboratorio | Responsable | Estado | Entregable |
-| - | ----------- | ----------- | ------ | ---------- |
-| 01 | Circuit Breaker | César | bloque de César | — |
-| 02 | Retry | César | bloque de César | — |
-| 03 | Timeout | César | bloque de César | — |
-| 04 | Serverless y Docker | Erik | **Completo (7/7)** | [README](04-serverless-docker/README.md) · [evidencias](04-serverless-docker/evidencias/README.md) |
-| 05 | API Gateway, ALB y Reverse Proxy | Erik | **Completo (5/5)** | [README](05-gateway-lb-proxy/README.md) · [evidencias](05-gateway-lb-proxy/evidencias/README.md) |
-| 06 | Hub-and-Spoke | César | bloque de César | — |
-| 07 | Lift-and-Shift (On-Premise → EC2) | Erik | **Completo (10/10)** | [README](07-lift-and-shift/README.md) · [evidencias](07-lift-and-shift/evidencias/README.md) · [informe](07-lift-and-shift/INFORME.md) |
-| 08 | Bastion Host | César | bloque de César | — |
+## Equipo y responsabilidades
 
-Los laboratorios 04, 05 y 07 están publicados en `erik/practicas`. Cada uno
-administra su propia infraestructura con un estado Terraform independiente:
-destruir o desactivar uno no afecta a los demás.
+| Integrante | Laboratorios |
+|---|---|
+| Erik | 01, 04, 05, 07 |
+| César | 02, 03, 06, 08 |
 
-## Resultados verificados
+El Laboratorio 01 estaba asignado originalmente a César. Para esta entrega,
+Erik asumió su implementación en una rama independiente, sin modificar el
+trabajo de César ni los laboratorios ya terminados.
 
-**Laboratorio 04 — Serverless y Docker**
+## Integración en GitHub
 
-- AWS Lambda `cloudlab-erik-lambda` activa.
-- Imagen de la API empaquetada y publicada en ECR `cloudlab-erik-api`.
-- Cluster ECS `cloudlab-erik-cluster` y servicio `cloudlab-erik-api` operativos.
-- Capturas reales de consola AWS incluidas en `evidencias/`.
+- `main` contiene el trabajo integrado y revisado.
+- Ramas de trabajo: `erik/practicas` y `cesar/practicas`.
+- Cada laboratorio se desarrolla en su propia carpeta y se integra mediante
+  Pull Requests.
+- Los laboratorios 04, 05 y 07 se integraron previamente mediante el PR #1.
 
-**Laboratorio 05 — API Gateway, ALB y Reverse Proxy**
+### Flujo del Laboratorio 01
 
-- API Gateway HTTP y ALB con NGINX como reverse proxy desplegados y probados.
-- Target group con 2 objetivos Fargate en estado `healthy`.
-- Evidencias de ejecución y capturas de consola incluidas en `evidencias/`.
+```text
+erik/circuit-breaker
+        │  PR #3
+        ▼
+erik/practicas
+        │  PR #4
+        ▼
+main
+```
 
-**Laboratorio 07 — Lift-and-Shift**
+- **PR #3:** [`erik/circuit-breaker` → `erik/practicas`](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/3) (mergeado).
+- **PR #4:** [`erik/practicas` → `main`](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/4) (mergeado).
+- El [PR directo #2](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/2)
+  (`erik/circuit-breaker` → `main`) se cerró para respetar el flujo de
+  integración por `erik/practicas`.
 
-- VM Ubuntu 24.04.5 local (`onprem-legacy-server`) con la aplicación Python
-  ejecutándose como servicio `systemd` `legacyapp`, `/health` → HTTP 200.
-- EC2 `i-03175f428ac57d526` (`cloudlab-erik-liftshift-ec2`, `t3.micro`,
-  Ubuntu 24.04.5) creada con Terraform; misma aplicación y mismo hash SHA256
-  `03b47adf2f62b2ebe85bfd0c91899c199dd63243df95d635fa6ac407c1ed8230`.
-- HTTP 200 en AWS y captura real de la consola con la instancia en `Running`.
-- `terraform destroy` ejecutado al final: 8 recursos eliminados, estado vacío.
-- 3 pruebas unitarias en `OK` y 13 archivos de evidencia.
+## Laboratorio 01 — Circuit Breaker
 
-## Cómo ejecutar
+Implementación completa con dos microservicios FastAPI, PyBreaker, Docker
+Compose y Amazon ECS Fargate. Demuestra los estados `CLOSED`, `OPEN` y
+`HALF-OPEN`, el rechazo sin llamada al backend y la recuperación controlada.
 
-1. `git switch erik/practicas && git pull --ff-only origin erik/practicas`.
-2. Seguir el README del laboratorio correspondiente. Cada uno es autónomo e
-   indica sus requisitos, credenciales, comandos y criterios de aceptación.
-3. Las credenciales AWS Academy se configuran **solo en local** en
-   `~/.aws/credentials` bajo el perfil `lab`; nunca se versionan.
+| Resultado | Evidencia |
+|---|---|
+| 16 pruebas aprobadas | [01-pytest.txt](01-circuit-breaker/evidencias/01-pytest.txt) |
+| Dos contenedores Docker | [02-docker-ps.txt](01-circuit-breaker/evidencias/02-docker-ps.txt) |
+| Operación normal | [03-normal-operation.txt](01-circuit-breaker/evidencias/03-normal-operation.txt) |
+| Apertura del circuito | [04-circuit-open.txt](01-circuit-breaker/evidencias/04-circuit-open.txt) |
+| Rechazo sin llamar al backend | [05-fast-fail.txt](01-circuit-breaker/evidencias/05-fast-fail.txt) |
+| Recuperación `HALF-OPEN` | [06-circuit-recovery.txt](01-circuit-breaker/evidencias/06-circuit-recovery.txt) |
+| Terraform validado y aplicado | [07](01-circuit-breaker/evidencias/07-terraform-validate.txt) · [08](01-circuit-breaker/evidencias/08-terraform-plan.txt) · [09](01-circuit-breaker/evidencias/09-terraform-apply.txt) |
+| Servicio ECS Fargate | [10-ecs.png](01-circuit-breaker/evidencias/10-ecs.png) |
+| Demo real en AWS | [11-aws-demo.txt](01-circuit-breaker/evidencias/11-aws-demo.txt) |
+| Logs de CloudWatch | [12-cloudwatch.txt](01-circuit-breaker/evidencias/12-cloudwatch.txt) |
+| Destrucción de recursos | [13-terraform-destroy.txt](01-circuit-breaker/evidencias/13-terraform-destroy.txt) |
 
-## Seguridad y buenas prácticas
+Documentación completa: [README del laboratorio](01-circuit-breaker/README.md),
+[arquitectura](01-circuit-breaker/ARQUITECTURA.md) e
+[informe](01-circuit-breaker/INFORME.md).
 
-- No se suben credenciales, tokens, claves privadas, `terraform.tfvars`,
-  `terraform.tfstate` ni planes `tfplan`. Cada laboratorio tiene su `.gitignore`.
-- El acceso SSH y HTTP se restringe a CIDR `/32` por Security Group; en el
-  laboratorio 07 se autorizan dos IP porque la red del laboratorio tiene una
-  salida distinta para SSH y para HTTP (ver `04b-terraform-cidr-fix.txt`).
-- Los cambios se integran en `erik/practicas` mediante commits ordinarios; la
-  rama principal queda para trabajo integrado y revisado.
+## Laboratorios 04, 05 y 07
 
-## Control de costos
+| Lab | Implementación | Estado |
+|---|---|---|
+| 04 | Lambda, ECR y ECS Fargate con Terraform. | Completado; servicio ECS en `desired=0` y evidencias publicadas. |
+| 05 | API Gateway, ALB y NGINX reverse proxy. | Completado; infraestructura desactivada en la configuración local y evidencias publicadas. |
+| 07 | Lift-and-Shift de una app Python a EC2. | Completado; migración verificada con hash idéntico y recursos AWS destruidos. |
 
-Tras obtener las evidencias se desactivaron todos los recursos de pago que ya
-no eran necesarios:
+## Estructura del repositorio
 
-| Laboratorio | Acción final | Resultado |
-| ----------- | ------------ | --------- |
-| 07 | `terraform destroy` sobre su propio estado | 8 recursos destruidos; EC2 `terminated`; 0 recursos en el state |
-| 05 | `enable_lab05 = false` y `enable_lab05_alb = false` en `terraform.tfvars` local | 0 ALB, 0 API Gateway |
-| 04 | `desired_count = 0` en `terraform.tfvars` local | Lambda, ECR, cluster y servicio ECS siguen activos, pero con **0 tareas Fargate** (`desired=0`, `running=0`) |
+```text
+cloud-patterns-lab/
+├── 01-circuit-breaker/      # FastAPI + PyBreaker + Docker + ECS Fargate
+├── 02-retry/                # Pendiente (César)
+├── 03-timeout/              # Pendiente (César)
+├── 04-serverless-docker/    # Lambda + ECR + ECS Fargate
+├── 05-gateway-lb-proxy/     # API Gateway + ALB + NGINX
+├── 06-hub-and-spoke/        # Pendiente (César)
+├── 07-lift-and-shift/       # VM on-premise → EC2
+└── 08-bastion/              # Pendiente (César)
+```
 
-La VM local de laboratorio 07 se apagó al terminar. Los archivos
-`terraform.tfvars` modificados para la desactivación del laboratorio 05 y para
-detener las tareas del 04 están ignorados por Git, por lo que el repositorio
-conserva la configuración por defecto de ambos laboratorios. La variable
-`desired_count` agregada al laboratorio 04 tiene valor por defecto `null`, que
-mantiene el comportamiento original (2 tareas con ALB, 1 sin ALB); basta con
-quitar la línea del `tfvars` local para reactivar la demostración.
+Cada laboratorio incluye su propio `README.md`, código, configuración,
+pruebas y carpeta `evidencias/`.
 
 ## Tecnologías
 
-AWS (Lambda, ECR, ECS Fargate, API Gateway, ALB, EC2, VPC, IAM), Terraform,
-Docker, Python, NGINX, QEMU/KVM, systemd, Git y GitHub.
+AWS (Lambda, ECR, ECS Fargate, EC2, API Gateway, ALB, CloudWatch), Terraform,
+Docker y Docker Compose, Python 3.12, FastAPI, PyBreaker, HTTPX, Pytest,
+NGINX, Git y GitHub.
+
+## Evidencias y buenas prácticas
+
+- Las evidencias se generan ejecutando los comandos reales; no se fabrican
+  resultados.
+- No se versionan credenciales, tokens, llaves privadas, `terraform.tfvars`,
+  estados de Terraform ni planes.
+- Los recursos AWS de prueba se apagan o destruyen al finalizar cada
+  laboratorio.
+- Los estados de Terraform son independientes por laboratorio para evitar
+  modificaciones accidentales entre ellos.
+
+## Estado AWS y control de costos
+
+- **Lab01:** 7 recursos destruidos; servicio ECS `INACTIVE`; sin ECR, log
+  groups ni Security Group del laboratorio. Clúster, VPC, subredes y `LabRole`
+  compartidos intactos.
+- **Lab04:** servicio ECS `cloudlab-erik-api` en `desired=0`, `running=0`.
+- **Lab05:** infraestructura desactivada mediante variables locales.
+- **Lab07:** instancia EC2 terminada y recursos destruidos; VM local apagada.
+- No hay instancias EC2 en ejecución.
+
+## Cómo revisar un laboratorio
+
+Cada README explica los requisitos, la ejecución local, el despliegue y las
+evidencias. Para el Laboratorio 01:
+
+```bash
+cd 01-circuit-breaker
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m pytest -v
+docker compose up --build -d
+bash scripts/demo.sh
+docker compose down
+```
+
+## Entregables
+
+Cada laboratorio incluye:
+
+- Descripción de la solución y diagrama de arquitectura.
+- Código y configuración.
+- Instrucciones de ejecución local y en AWS.
+- Pruebas automatizadas.
+- Evidencias reales (logs, capturas y salidas de comandos).
+- Resultados y limitaciones.
+
+## Referencias
+
+- Documentación de AWS: <https://docs.aws.amazon.com/>
+- Terraform AWS Provider: <https://registry.terraform.io/providers/hashicorp/aws/latest>
+- PyBreaker: <https://github.com/danielfm/pybreaker>
+- FastAPI: <https://fastapi.tiangolo.com/>
