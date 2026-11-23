@@ -154,6 +154,7 @@ posterior:
 
 ## Integración en GitHub
 
-El laboratorio se integró en la rama `erik/practicas`. El flujo de revisión y
-la incorporación a `main` se documentan en el `README.md` principal del
-repositorio.
+El laboratorio se integró en la rama `erik/practicas` mediante el
+[PR #11](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11). El flujo
+de revisión y la incorporación a `main` se documentan en el `README.md`
+principal del repositorio.

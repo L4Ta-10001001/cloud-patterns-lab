@@ -87,7 +87,7 @@ exclusión de HTTP 400 de los reintentos.
 
 Documentación completa: [README del laboratorio](02-retry/README.md),
 [arquitectura](02-retry/ARQUITECTURA.md) e
-[informe](02-retry/INFORME.md).
+[informe](02-retry/INFORME.md). Integración: [PR #11](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11).
 
 ## Laboratorios 04, 05 y 07
 

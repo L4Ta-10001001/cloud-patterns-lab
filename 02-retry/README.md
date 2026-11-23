@@ -19,7 +19,7 @@ solicitudes y el cliente devuelve `attempts=3`, `retries=2` y
 |---|---|
 | Rama de trabajo | `erik/practicas` |
 | Implementación | Erik asumió el Laboratorio 02, asignado inicialmente a César |
-| Flujo de integración | `erik/practicas` → PR de revisión → `main` |
+| Flujo de integración | `erik/practicas` → [PR #11](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11) → `main` |
 | Estado local | ✅ Implementado y probado |
 | Estado AWS | ✅ Desplegado en ECS Fargate, verificado y destruido |
 
@@ -438,7 +438,7 @@ aplicación y verificó los contadores del backend para cada `run_id`.
 | 10 | Terraform validado y recursos AWS desplegados | `09`, `10`, `11` | ✅ |
 | 11 | Retry ejecutado y verificado en ECS Fargate | `12`, `13` | ✅ |
 | 12 | Evidencias y documentación completas | `01`–`15`, README, ARQUITECTURA, INFORME | ✅ |
-| 13 | Código integrado en GitHub | Commit y PR de `erik/practicas` | ⏳ En curso |
+| 13 | Código integrado en GitHub | Commit y [PR #11](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11) | ✅ |
 | 14 | Recursos AWS de prueba eliminados | `15-terraform-destroy.txt` | ✅ |
 
 ## Evidencias

@@ -174,6 +174,7 @@ local y la limpieza posterior confirmó que no quedaron recursos de prueba.
 
 - Repositorio: <https://github.com/L4Ta-10001001/cloud-patterns-lab>
 - Rama: `erik/practicas`
+- Pull request: <https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11>
 - Carpeta: `02-retry/`
 - Documentación: `README.md`, `ARQUITECTURA.md`, `INFORME.md`
 - Evidencias: `02-retry/evidencias/`
