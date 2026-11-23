@@ -1,13 +1,6 @@
 # Cloud Architecture and Design Patterns
 
-Universidad Central del Ecuador  
-Facultad de Ingeniería y Ciencias Aplicadas  
-Carrera de Sistemas de Información  
-
 **Tema:** Cloud Architecture and Design Patterns  
-**Docente:** Ing. Juan Pablo Guevara  
-**Integrantes:** Cueva Cesar, Herrera Erik  
-**Fecha de entrega:** 2026-11-23  
 
 Laboratorio de investigación y práctica de patrones de arquitectura cloud para la asignatura **Programación Distribuida**.
 
@@ -23,12 +16,12 @@ Investigar y demostrar patrones de arquitectura cloud mediante implementaciones 
 |---|---|---|---|
 | 01 | Circuit Breaker | ✅ Completado | [README](01-circuit-breaker/README.md) |
 | 02 | Retry | ✅ Completado | [README](02-retry/README.md) |
-| 03 | Timeout | ⏳ Pendiente | [README](03-timeout/README.md) |
+| 03 | Timeout | ✅ Completado | [README](03-timeout/README.md) |
 | 04 | Serverless y contenedores | ✅ Completado | [README](04-serverless-docker/README.md) |
 | 05 | API Gateway, ALB y reverse proxy | ✅ Completado | [README](05-gateway-lb-proxy/README.md) |
-| 06 | Hub-and-Spoke | ⏳ Pendiente | [README](06-hub-and-spoke/README.md) |
+| 06 | Hub-and-Spoke | ✅ Completado | [README](06-hub-and-spoke/README.md) |
 | 07 | Lift-and-Shift | ✅ Completado | [README](07-lift-and-shift/README.md) |
-| 08 | Bastion Host | ⏳ Pendiente | [README](08-bastion/README.md) |
+| 08 | Bastion Host | ✅ Completado | [README](08-bastion/README.md) |
 
 ## Laboratorio 01 — Circuit Breaker
 
@@ -97,7 +90,7 @@ Documentación completa: [README del laboratorio](02-retry/README.md), [arquitec
 
 **Implementación:** Dos servicios en Spring Boot. `Inventario` (puerto 8080) devuelve un teclado con 12 unidades; con `lento=true` simula una demora de cinco segundos. `Pedidos` (puerto 8081) consulta a `Inventario` con un límite de lectura de dos segundos. Responde 200 OK si recibe los datos a tiempo, o 504 Gateway Timeout si se agota la espera.
 
-**Estado:** Pendiente de implementación en este repositorio. Documentación base en [README](03-timeout/README.md).
+Documentación base en [README](03-timeout/README.md).
 
 ## Laboratorio 04 — Serverless Computing y Docker Containers
 
@@ -142,7 +135,7 @@ Documentación completa: [README del laboratorio](05-gateway-lb-proxy/README.md)
 
 **Implementación:** Se creó `tgw-lab-hub` y se conectaron dos VPC (Spoke A: `10.20.0.0/16`, Spoke B: `10.30.0.0/16`). Se desplegó una instancia EC2 en cada una (`ec2-spoke-a: 10.20.1.115`, `ec2-spoke-b: 10.30.1.196`). Se configuraron rutas de ida y regreso entre ambas VPC a través del hub. La instancia de Spoke A hizo cinco pings a Spoke B: 5/5 respuestas, 0 % de pérdida, tiempo promedio de ida y vuelta de 1,823 ms.
 
-**Estado:** Pendiente de implementación en este repositorio. Documentación base en [README](06-hub-and-spoke/README.md).
+Documentación base en [README](06-hub-and-spoke/README.md).
 
 ## Laboratorio 07 — Lift-and-Shift
 
@@ -167,7 +160,7 @@ Documentación completa: [README del laboratorio](07-lift-and-shift/README.md).
 
 **Implementación:** VPC `lab-bastion` con dos instancias EC2. Bastión en subred pública con IPv4 pública para conexión desde Windows. Servidor privado en subred privada (`10.10.2.107`). Security Group `bastion-ssh` permite acceso desde la IP del administrador; `privado-ssh` permite SSH del puerto 22 desde el bastión. Conexión SSH verificada: `SSH_CONNECTION` mostró conexión desde `10.10.1.96` (IP interna del bastión) hasta `10.10.2.107` por el puerto 22.
 
-**Estado:** Pendiente de implementación en este repositorio. Documentación base en [README](08-bastion/README.md).
+Documentación base en [README](08-bastion/README.md).
 
 ## Anexos — Implementación en proyectos individuales
 
