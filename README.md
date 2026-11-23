@@ -13,33 +13,20 @@ reales de su ejecución local y en AWS.
 
 **5 de 8 laboratorios completados.**
 
-| Lab | Tema | Responsable | Estado | Documentación |
-|---|---|---|---|---|
-| 01 | Circuit Breaker | Erik | ✅ Completado | [README](01-circuit-breaker/README.md) |
-| 02 | Retry | Erik* | ✅ Completado | [README](02-retry/README.md) |
-| 03 | Timeout | César | ⏳ Pendiente | [README](03-timeout/README.md) |
-| 04 | Serverless y contenedores | Erik | ✅ Completado | [README](04-serverless-docker/README.md) |
-| 05 | API Gateway, ALB y reverse proxy | Erik | ✅ Completado | [README](05-gateway-lb-proxy/README.md) |
-| 06 | Hub-and-Spoke | César | ⏳ Pendiente | [README](06-hub-and-spoke/README.md) |
-| 07 | Lift-and-Shift | Erik | ✅ Completado | [README](07-lift-and-shift/README.md) |
-| 08 | Bastion Host | César | ⏳ Pendiente | [README](08-bastion/README.md) |
-
-\* El Laboratorio 02 estaba asignado inicialmente a César. Erik asumió su
-implementación para completar el laboratorio, sin modificar los laboratorios
-03, 06 ni 08.
-
-## Equipo y responsabilidades
-
-| Integrante | Laboratorios |
-|---|---|
-| Erik | 01, 02, 04, 05, 07 |
-| César | 03, 06, 08 |
+| Lab | Tema | Estado | Documentación |
+|---|---|---|---|
+| 01 | Circuit Breaker | ✅ Completado | [README](01-circuit-breaker/README.md) |
+| 02 | Retry | ✅ Completado | [README](02-retry/README.md) |
+| 03 | Timeout | ⏳ Pendiente | [README](03-timeout/README.md) |
+| 04 | Serverless y contenedores | ✅ Completado | [README](04-serverless-docker/README.md) |
+| 05 | API Gateway, ALB y reverse proxy | ✅ Completado | [README](05-gateway-lb-proxy/README.md) |
+| 06 | Hub-and-Spoke | ⏳ Pendiente | [README](06-hub-and-spoke/README.md) |
+| 07 | Lift-and-Shift | ✅ Completado | [README](07-lift-and-shift/README.md) |
+| 08 | Bastion Host | ⏳ Pendiente | [README](08-bastion/README.md) |
 
 ## Laboratorio 01 — Circuit Breaker
 
-Implementación completa con dos microservicios FastAPI, PyBreaker, Docker
-Compose y Amazon ECS Fargate. Demuestra los estados `CLOSED`, `OPEN` y
-`HALF-OPEN`, el rechazo sin llamada al backend y la recuperación controlada.
+Dos microservicios FastAPI con PyBreaker, Docker Compose y Amazon ECS Fargate. Demuestra los estados `CLOSED`, `OPEN` y `HALF-OPEN`, el rechazo sin llamada al backend y la recuperación controlada.
 
 | Resultado | Evidencia |
 |---|---|
@@ -55,16 +42,11 @@ Compose y Amazon ECS Fargate. Demuestra los estados `CLOSED`, `OPEN` y
 | Logs de CloudWatch | [12-cloudwatch.txt](01-circuit-breaker/evidencias/12-cloudwatch.txt) |
 | Destrucción de recursos | [13-terraform-destroy.txt](01-circuit-breaker/evidencias/13-terraform-destroy.txt) |
 
-Documentación completa: [README del laboratorio](01-circuit-breaker/README.md),
-[arquitectura](01-circuit-breaker/ARQUITECTURA.md) e
-[informe](01-circuit-breaker/INFORME.md).
+Documentación completa: [README del laboratorio](01-circuit-breaker/README.md), [arquitectura](01-circuit-breaker/ARQUITECTURA.md) e [informe](01-circuit-breaker/INFORME.md).
 
 ## Laboratorio 02 — Retry
 
-Implementación completa con dos microservicios FastAPI, Tenacity, Docker
-Compose y Amazon ECS Fargate. Demuestra la recuperación tras dos fallos
-transitorios, el límite de tres intentos, el exponential backoff y la
-exclusión de HTTP 400 de los reintentos.
+Dos microservicios FastAPI con Tenacity, Docker Compose y Amazon ECS Fargate. Demuestra la recuperación tras dos fallos transitorios, el límite de tres intentos, el exponential backoff y la exclusión de HTTP 400 de los reintentos.
 
 | Resultado | Evidencia |
 |---|---|
@@ -82,12 +64,9 @@ exclusión de HTTP 400 de los reintentos.
 | Logs de CloudWatch | [14-cloudwatch.txt](02-retry/evidencias/14-cloudwatch.txt) |
 | Destrucción de recursos | [15-terraform-destroy.txt](02-retry/evidencias/15-terraform-destroy.txt) |
 
-`12-ecs.png` es un renderizado de la salida real de AWS CLI guardada en
-`12-ecs.txt`, no una captura de la consola web.
+`12-ecs.png` es un renderizado de la salida real de AWS CLI guardada en `12-ecs.txt`, no una captura de la consola web.
 
-Documentación completa: [README del laboratorio](02-retry/README.md),
-[arquitectura](02-retry/ARQUITECTURA.md) e
-[informe](02-retry/INFORME.md). Integración: [PR #11](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11).
+Documentación completa: [README del laboratorio](02-retry/README.md), [arquitectura](02-retry/ARQUITECTURA.md) e [informe](02-retry/INFORME.md). Integración: [PR #11](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11).
 
 ## Laboratorios 04, 05 y 07
 
