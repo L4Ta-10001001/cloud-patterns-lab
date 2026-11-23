@@ -1,0 +1,605 @@
+# 15 - Destruccion de recursos AWS y verificacion
+Fecha de ejecucion: 2026-11-22T20:23:56-05:00
+Region: us-east-1
+IP autorizada: 157.100.142.229/32
+
+Nota: este archivo reune la salida real capturada durante la destruccion.
+Los bloques se ordenaron para la evidencia; no se modificaron sus valores.
+
+## Sincronizacion de ECR para permitir el borrado de repositorios con imagenes
+=== ECR: sincronizar force_delete ===
+aws_ecr_repository.this["backend"]: Refreshing state... [id=cloudlab-erik-retry-backend]
+aws_ecr_repository.this["client"]: Refreshing state... [id=cloudlab-erik-retry-client]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_ecr_repository.this["backend"] will be updated in-place
+  ~ resource "aws_ecr_repository" "this" {
+      + force_delete         = true
+        id                   = "cloudlab-erik-retry-backend"
+        name                 = "cloudlab-erik-retry-backend"
+        tags                 = {
+            "Lab"     = "02-retry"
+            "Service" = "backend"
+        }
+        # (6 unchanged attributes hidden)
+
+        # (2 unchanged blocks hidden)
+    }
+
+  # aws_ecr_repository.this["client"] will be updated in-place
+  ~ resource "aws_ecr_repository" "this" {
+      + force_delete         = true
+        id                   = "cloudlab-erik-retry-client"
+        name                 = "cloudlab-erik-retry-client"
+        tags                 = {
+            "Lab"     = "02-retry"
+            "Service" = "client"
+        }
+        # (6 unchanged attributes hidden)
+
+        # (2 unchanged blocks hidden)
+    }
+
+Plan: 0 to add, 2 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+aws_ecr_repository.this["backend"]: Modifying... [id=cloudlab-erik-retry-backend]
+aws_ecr_repository.this["client"]: Modifying... [id=cloudlab-erik-retry-client]
+aws_ecr_repository.this["client"]: Modifications complete after 1s [id=cloudlab-erik-retry-client]
+aws_ecr_repository.this["backend"]: Modifications complete after 1s [id=cloudlab-erik-retry-backend]
+
+Apply complete! Resources: 0 added, 2 changed, 0 destroyed.
+
+Outputs:
+
+backend_repository_name = "cloudlab-erik-retry-backend"
+backend_repository_url = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend"
+client_repository_name = "cloudlab-erik-retry-client"
+client_repository_url = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client"
+image_tag = "v1"
+
+## terraform destroy - terraform/runtime
+=== Destruyendo runtime ===
+data.aws_caller_identity.current: Reading...
+data.aws_iam_role.execution: Reading...
+data.aws_vpc.default[0]: Reading...
+data.aws_iam_role.task: Reading...
+data.aws_region.current: Reading...
+aws_cloudwatch_log_group.backend: Refreshing state... [id=/ecs/cloudlab-erik-retry-backend]
+aws_ecs_cluster.this[0]: Refreshing state... [id=arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-retry-cluster]
+aws_cloudwatch_log_group.client: Refreshing state... [id=/ecs/cloudlab-erik-retry-client]
+data.aws_region.current: Read complete after 0s [id=us-east-1]
+data.aws_caller_identity.current: Read complete after 0s [id=533267299755]
+data.aws_iam_role.task: Read complete after 1s [id=LabRole]
+data.aws_iam_role.execution: Read complete after 1s [id=LabRole]
+aws_ecs_task_definition.this: Refreshing state... [id=cloudlab-erik-retry]
+data.aws_vpc.default[0]: Read complete after 1s [id=vpc-0bfdd39b2f8f6f14b]
+data.aws_vpc.selected: Reading...
+data.aws_vpc.selected: Read complete after 1s [id=vpc-0bfdd39b2f8f6f14b]
+data.aws_subnets.default[0]: Reading...
+aws_security_group.client: Refreshing state... [id=sg-00c8147afabb6ae12]
+data.aws_subnets.default[0]: Read complete after 0s [id=us-east-1]
+aws_ecs_service.this: Refreshing state... [id=arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-retry-cluster/cloudlab-erik-retry-service]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_cloudwatch_log_group.backend will be destroyed
+  - resource "aws_cloudwatch_log_group" "backend" {
+      - arn                         = "arn:aws:logs:us-east-1:533267299755:log-group:/ecs/cloudlab-erik-retry-backend" -> null
+      - deletion_protection_enabled = false -> null
+      - id                          = "/ecs/cloudlab-erik-retry-backend" -> null
+      - log_group_class             = "STANDARD" -> null
+      - name                        = "/ecs/cloudlab-erik-retry-backend" -> null
+      - region                      = "us-east-1" -> null
+      - retention_in_days           = 3 -> null
+      - skip_destroy                = false -> null
+      - tags                        = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - tags_all                    = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+        # (2 unchanged attributes hidden)
+    }
+
+  # aws_cloudwatch_log_group.client will be destroyed
+  - resource "aws_cloudwatch_log_group" "client" {
+      - arn                         = "arn:aws:logs:us-east-1:533267299755:log-group:/ecs/cloudlab-erik-retry-client" -> null
+      - deletion_protection_enabled = false -> null
+      - id                          = "/ecs/cloudlab-erik-retry-client" -> null
+      - log_group_class             = "STANDARD" -> null
+      - name                        = "/ecs/cloudlab-erik-retry-client" -> null
+      - region                      = "us-east-1" -> null
+      - retention_in_days           = 3 -> null
+      - skip_destroy                = false -> null
+      - tags                        = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - tags_all                    = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+        # (2 unchanged attributes hidden)
+    }
+
+  # aws_ecs_cluster.this[0] will be destroyed
+  - resource "aws_ecs_cluster" "this" {
+      - arn      = "arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-retry-cluster" -> null
+      - id       = "arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-retry-cluster" -> null
+      - name     = "cloudlab-erik-retry-cluster" -> null
+      - region   = "us-east-1" -> null
+      - tags     = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - tags_all = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+
+      - setting {
+          - name  = "containerInsights" -> null
+          - value = "disabled" -> null
+        }
+    }
+
+  # aws_ecs_service.this will be destroyed
+  - resource "aws_ecs_service" "this" {
+      - arn                                = "arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-retry-cluster/cloudlab-erik-retry-service" -> null
+      - availability_zone_rebalancing      = "ENABLED" -> null
+      - cluster                            = "cloudlab-erik-retry-cluster" -> null
+      - deployment_maximum_percent         = 200 -> null
+      - deployment_minimum_healthy_percent = 100 -> null
+      - desired_count                      = 1 -> null
+      - enable_ecs_managed_tags            = false -> null
+      - enable_execute_command             = false -> null
+      - health_check_grace_period_seconds  = 0 -> null
+      - iam_role                           = "/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS" -> null
+      - id                                 = "arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-retry-cluster/cloudlab-erik-retry-service" -> null
+      - launch_type                        = "FARGATE" -> null
+      - name                               = "cloudlab-erik-retry-service" -> null
+      - platform_version                   = "LATEST" -> null
+      - propagate_tags                     = "NONE" -> null
+      - region                             = "us-east-1" -> null
+      - scheduling_strategy                = "REPLICA" -> null
+      - tags                               = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - tags_all                           = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - task_definition                    = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry:1" -> null
+      - triggers                           = {} -> null
+      - wait_for_steady_state              = false -> null
+
+      - deployment_circuit_breaker {
+          - enable   = true -> null
+          - rollback = true -> null
+        }
+
+      - deployment_configuration {
+          - bake_time_in_minutes = "0" -> null
+          - strategy             = "ROLLING" -> null
+        }
+
+      - deployment_controller {
+          - type = "ECS" -> null
+        }
+
+      - network_configuration {
+          - assign_public_ip = true -> null
+          - security_groups  = [
+              - "sg-00c8147afabb6ae12",
+            ] -> null
+          - subnets          = [
+              - "subnet-00c75f9aed20d38fa",
+              - "subnet-04da5e5b1df085bf0",
+              - "subnet-04dab9ed2b71261a0",
+              - "subnet-093fa2a5b495b57cf",
+              - "subnet-0b312bb3c8246f912",
+              - "subnet-0d1186cdb06fa5d98",
+            ] -> null
+        }
+    }
+
+  # aws_ecs_task_definition.this will be destroyed
+  - resource "aws_ecs_task_definition" "this" {
+      - arn                      = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry:1" -> null
+      - arn_without_revision     = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry" -> null
+      - container_definitions    = jsonencode(
+            [
+              - {
+                  - environment      = [
+                      - {
+                          - name  = "LOG_LEVEL"
+                          - value = "INFO"
+                        },
+                    ]
+                  - essential        = true
+                  - healthCheck      = {
+                      - command     = [
+                          - "CMD-SHELL",
+                          - "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8001/health\")'",
+                        ]
+                      - interval    = 15
+                      - retries     = 3
+                      - startPeriod = 10
+                      - timeout     = 5
+                    }
+                  - image            = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1"
+                  - logConfiguration = {
+                      - logDriver = "awslogs"
+                      - options   = {
+                          - awslogs-group         = "/ecs/cloudlab-erik-retry-backend"
+                          - awslogs-region        = "us-east-1"
+                          - awslogs-stream-prefix = "backend"
+                        }
+                    }
+                  - mountPoints      = []
+                  - name             = "backend"
+                  - portMappings     = [
+                      - {
+                          - containerPort = 8001
+                          - hostPort      = 8001
+                          - protocol      = "tcp"
+                        },
+                    ]
+                  - systemControls   = []
+                  - volumesFrom      = []
+                },
+              - {
+                  - dependsOn        = [
+                      - {
+                          - condition     = "START"
+                          - containerName = "backend"
+                        },
+                    ]
+                  - environment      = [
+                      - {
+                          - name  = "BACKEND_URL"
+                          - value = "http://127.0.0.1:8001"
+                        },
+                      - {
+                          - name  = "HTTP_TIMEOUT"
+                          - value = "2.0"
+                        },
+                      - {
+                          - name  = "LOG_LEVEL"
+                          - value = "INFO"
+                        },
+                      - {
+                          - name  = "RETRY_INITIAL_WAIT"
+                          - value = "0.5"
+                        },
+                      - {
+                          - name  = "RETRY_MAX_ATTEMPTS"
+                          - value = "3"
+                        },
+                      - {
+                          - name  = "RETRY_MAX_WAIT"
+                          - value = "2.0"
+                        },
+                    ]
+                  - essential        = true
+                  - healthCheck      = {
+                      - command     = [
+                          - "CMD-SHELL",
+                          - "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8000/health\")'",
+                        ]
+                      - interval    = 15
+                      - retries     = 3
+                      - startPeriod = 10
+                      - timeout     = 5
+                    }
+                  - image            = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1"
+                  - logConfiguration = {
+                      - logDriver = "awslogs"
+                      - options   = {
+                          - awslogs-group         = "/ecs/cloudlab-erik-retry-client"
+                          - awslogs-region        = "us-east-1"
+                          - awslogs-stream-prefix = "client"
+                        }
+                    }
+                  - mountPoints      = []
+                  - name             = "client"
+                  - portMappings     = [
+                      - {
+                          - containerPort = 8000
+                          - hostPort      = 8000
+                          - protocol      = "tcp"
+                        },
+                    ]
+                  - systemControls   = []
+                  - volumesFrom      = []
+                },
+            ]
+        ) -> null
+      - cpu                      = "512" -> null
+      - enable_fault_injection   = false -> null
+      - execution_role_arn       = "arn:aws:iam::533267299755:role/LabRole" -> null
+      - family                   = "cloudlab-erik-retry" -> null
+      - id                       = "cloudlab-erik-retry" -> null
+      - memory                   = "1024" -> null
+      - network_mode             = "awsvpc" -> null
+      - region                   = "us-east-1" -> null
+      - requires_compatibilities = [
+          - "FARGATE",
+        ] -> null
+      - revision                 = 1 -> null
+      - skip_destroy             = false -> null
+      - tags                     = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - tags_all                 = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - task_role_arn            = "arn:aws:iam::533267299755:role/LabRole" -> null
+      - track_latest             = false -> null
+        # (2 unchanged attributes hidden)
+    }
+
+  # aws_security_group.client will be destroyed
+  - resource "aws_security_group" "client" {
+      - arn                    = "arn:aws:ec2:us-east-1:533267299755:security-group/sg-00c8147afabb6ae12" -> null
+      - description            = "Acceso HTTP al cliente Retry" -> null
+      - egress                 = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - description      = "Salida a internet y al backend interno"
+              - from_port        = 0
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+            },
+        ] -> null
+      - id                     = "sg-00c8147afabb6ae12" -> null
+      - ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "157.100.142.229/32",
+                ]
+              - description      = "Cliente HTTP desde la IP autorizada"
+              - from_port        = 8000
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "tcp"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 8000
+            },
+        ] -> null
+      - name                   = "cloudlab-erik-retry-client-sg" -> null
+      - owner_id               = "533267299755" -> null
+      - region                 = "us-east-1" -> null
+      - revoke_rules_on_delete = false -> null
+      - tags                   = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - tags_all               = {
+          - "Lab"     = "02-retry"
+          - "Project" = "cloudlab-erik"
+        } -> null
+      - vpc_id                 = "vpc-0bfdd39b2f8f6f14b" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 0 to change, 6 to destroy.
+
+Changes to Outputs:
+  - backend_image       = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1" -> null
+  - backend_log_group   = "/ecs/cloudlab-erik-retry-backend" -> null
+  - client_image        = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1" -> null
+  - client_log_group    = "/ecs/cloudlab-erik-retry-client" -> null
+  - cluster_name        = "cloudlab-erik-retry-cluster" -> null
+  - security_group_id   = "sg-00c8147afabb6ae12" -> null
+  - service_name        = "cloudlab-erik-retry-service" -> null
+  - task_definition_arn = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry:1" -> null
+  - task_lookup_command = "aws ecs list-tasks --cluster cloudlab-erik-retry-cluster --service-name cloudlab-erik-retry-service --query 'taskArns[0]' --output text" -> null
+aws_ecs_service.this: Destroying... [id=arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-retry-cluster/cloudlab-erik-retry-service]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 00m10s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 00m20s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 00m30s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 00m40s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 00m50s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 01m00s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 01m10s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 01m20s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 01m30s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 01m40s elapsed]
+aws_ecs_service.this: Still destroying... [id=arn:aws:ecs:us-east-1:533267299755:serv...ry-cluster/cloudlab-erik-retry-service, 01m50s elapsed]
+aws_ecs_service.this: Destruction complete after 1m51s
+aws_ecs_cluster.this[0]: Destroying... [id=arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-retry-cluster]
+aws_ecs_task_definition.this: Destroying... [id=cloudlab-erik-retry]
+aws_security_group.client: Destroying... [id=sg-00c8147afabb6ae12]
+aws_ecs_task_definition.this: Destruction complete after 0s
+aws_cloudwatch_log_group.backend: Destroying... [id=/ecs/cloudlab-erik-retry-backend]
+aws_cloudwatch_log_group.client: Destroying... [id=/ecs/cloudlab-erik-retry-client]
+aws_ecs_cluster.this[0]: Destruction complete after 0s
+aws_cloudwatch_log_group.client: Destruction complete after 1s
+aws_cloudwatch_log_group.backend: Destruction complete after 1s
+aws_security_group.client: Destruction complete after 1s
+
+Destroy complete! Resources: 6 destroyed.
+
+## terraform destroy - terraform/ecr
+=== Destruyendo ECR ===
+aws_ecr_repository.this["client"]: Refreshing state... [id=cloudlab-erik-retry-client]
+aws_ecr_repository.this["backend"]: Refreshing state... [id=cloudlab-erik-retry-backend]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_ecr_repository.this["backend"] will be destroyed
+  - resource "aws_ecr_repository" "this" {
+      - arn                  = "arn:aws:ecr:us-east-1:533267299755:repository/cloudlab-erik-retry-backend" -> null
+      - force_delete         = true -> null
+      - id                   = "cloudlab-erik-retry-backend" -> null
+      - image_tag_mutability = "MUTABLE" -> null
+      - name                 = "cloudlab-erik-retry-backend" -> null
+      - region               = "us-east-1" -> null
+      - registry_id          = "533267299755" -> null
+      - repository_url       = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend" -> null
+      - tags                 = {
+          - "Lab"     = "02-retry"
+          - "Service" = "backend"
+        } -> null
+      - tags_all             = {
+          - "Lab"     = "02-retry"
+          - "Service" = "backend"
+        } -> null
+
+      - encryption_configuration {
+          - encryption_type = "AES256" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - image_scanning_configuration {
+          - scan_on_push = true -> null
+        }
+    }
+
+  # aws_ecr_repository.this["client"] will be destroyed
+  - resource "aws_ecr_repository" "this" {
+      - arn                  = "arn:aws:ecr:us-east-1:533267299755:repository/cloudlab-erik-retry-client" -> null
+      - force_delete         = true -> null
+      - id                   = "cloudlab-erik-retry-client" -> null
+      - image_tag_mutability = "MUTABLE" -> null
+      - name                 = "cloudlab-erik-retry-client" -> null
+      - region               = "us-east-1" -> null
+      - registry_id          = "533267299755" -> null
+      - repository_url       = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client" -> null
+      - tags                 = {
+          - "Lab"     = "02-retry"
+          - "Service" = "client"
+        } -> null
+      - tags_all             = {
+          - "Lab"     = "02-retry"
+          - "Service" = "client"
+        } -> null
+
+      - encryption_configuration {
+          - encryption_type = "AES256" -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - image_scanning_configuration {
+          - scan_on_push = true -> null
+        }
+    }
+
+Plan: 0 to add, 0 to change, 2 to destroy.
+
+Changes to Outputs:
+  - backend_repository_name = "cloudlab-erik-retry-backend" -> null
+  - backend_repository_url  = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend" -> null
+  - client_repository_name  = "cloudlab-erik-retry-client" -> null
+  - client_repository_url   = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client" -> null
+  - image_tag               = "v1" -> null
+aws_ecr_repository.this["backend"]: Destroying... [id=cloudlab-erik-retry-backend]
+aws_ecr_repository.this["client"]: Destroying... [id=cloudlab-erik-retry-client]
+aws_ecr_repository.this["client"]: Destruction complete after 1s
+aws_ecr_repository.this["backend"]: Destruction complete after 1s
+
+Destroy complete! Resources: 2 destroyed.
+
+## Estado Terraform posterior
+$ terraform -chdir=terraform/runtime state list
+$ terraform -chdir=terraform/ecr state list
+
+## Verificacion ECS
+$ aws ecs describe-services --cluster cloudlab-erik-retry-cluster --services cloudlab-erik-retry-service
+[
+    {
+        "name": "cloudlab-erik-retry-service",
+        "status": "INACTIVE",
+        "desired": 0,
+        "running": 0
+    }
+]
+
+$ aws ecs list-tasks --cluster cloudlab-erik-retry-cluster --service-name cloudlab-erik-retry-service
+{
+    "taskArns": []
+}
+
+$ aws ecs describe-clusters --clusters cloudlab-erik-retry-cluster
+[
+    {
+        "name": "cloudlab-erik-retry-cluster",
+        "status": "INACTIVE",
+        "activeServices": 0,
+        "runningTasks": 0
+    }
+]
+
+$ aws ecs describe-task-definition --task-definition cloudlab-erik-retry:1
+{
+    "family": "cloudlab-erik-retry",
+    "revision": 1,
+    "status": "INACTIVE"
+}
+
+## Verificacion CloudWatch
+$ aws logs describe-log-groups --log-group-name-prefix /ecs/cloudlab-erik-retry
+[]
+
+## Verificacion Security Group
+$ aws ec2 describe-security-groups --filters Name=group-name,Values=cloudlab-erik-retry-client-sg
+[]
+
+## Verificacion ECR
+$ aws ecr describe-repositories --repository-names cloudlab-erik-retry-client
+
+aws: [ERROR]: An error occurred (RepositoryNotFoundException) when calling the DescribeRepositories operation: The repository with name 'cloudlab-erik-retry-client' does not exist in the registry with id '533267299755'
+
+$ aws ecr describe-repositories --repository-names cloudlab-erik-retry-backend
+
+aws: [ERROR]: An error occurred (RepositoryNotFoundException) when calling the DescribeRepositories operation: The repository with name 'cloudlab-erik-retry-backend' does not exist in the registry with id '533267299755'
+
+## Verificacion ENI de la tarea
+$ aws ec2 describe-network-interfaces --filters Name=group-name,Values=cloudlab-erik-retry-client-sg
+[]
+
+## Recursos compartidos intactos
+$ aws ec2 describe-vpcs --filters Name=is-default,Values=true
+[
+    {
+        "id": "vpc-0bfdd39b2f8f6f14b",
+        "cidr": "172.31.0.0/16"
+    }
+]
+$ aws iam get-role --role-name LabRole
+{
+    "name": "LabRole",
+    "arn": "arn:aws:iam::533267299755:role/LabRole"
+}

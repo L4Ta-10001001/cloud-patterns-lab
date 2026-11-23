@@ -1,0 +1,99 @@
+# 07 - Exponential Backoff: esperas progresivas entre intentos
+Fecha: 2026-11-22T20:04:21-05:00
+URL base: http://127.0.0.1:8092
+
+$ curl -sS "http://127.0.0.1:8092/request?scenario=transient&run_id=demo-20261122-200416-backoff"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "demo-20261122-200416-backoff",
+    "scenario": "transient",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": true,
+    "http_status": 200,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.563,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0184,
+            "timestamp": 1795395859.858387,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-backoff",
+                "scenario": "transient",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795395859.857117,
+                "message": "Fallo transitorio 1/2",
+                "failures_remaining": 1
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0118,
+            "timestamp": 1795395860.3705375,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-backoff",
+                "scenario": "transient",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795395860.3694105,
+                "message": "Fallo transitorio 2/2",
+                "failures_remaining": 0
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0321,
+            "timestamp": 1795395861.4030066,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-backoff",
+                "scenario": "transient",
+                "request_number": 3,
+                "http_status": 200,
+                "timestamp": 1795395861.400515,
+                "message": "Recuperado despues de fallos transitorios",
+                "failures_remaining": 0
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "demo-20261122-200416-backoff",
+        "scenario": "transient",
+        "request_number": 3,
+        "http_status": 200,
+        "timestamp": 1795395861.400515,
+        "message": "Recuperado despues de fallos transitorios",
+        "failures_remaining": 0
+    },
+    "error": null
+}
+
+Esperas configuradas (waits): [0.5, 1.0]
+Intervalos reales entre intentos (s): [0.512, 1.032]
+OK: el intervalo crece de ~0.5 s a ~1.0 s

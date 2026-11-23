@@ -11,12 +11,12 @@ reales de su ejecución local y en AWS.
 
 ## Estado actual
 
-**4 de 8 laboratorios completados.**
+**5 de 8 laboratorios completados.**
 
 | Lab | Tema | Responsable | Estado | Documentación |
 |---|---|---|---|---|
 | 01 | Circuit Breaker | Erik | ✅ Completado | [README](01-circuit-breaker/README.md) |
-| 02 | Retry | César | ⏳ Pendiente | [README](02-retry/README.md) |
+| 02 | Retry | Erik* | ✅ Completado | [README](02-retry/README.md) |
 | 03 | Timeout | César | ⏳ Pendiente | [README](03-timeout/README.md) |
 | 04 | Serverless y contenedores | Erik | ✅ Completado | [README](04-serverless-docker/README.md) |
 | 05 | API Gateway, ALB y reverse proxy | Erik | ✅ Completado | [README](05-gateway-lb-proxy/README.md) |
@@ -24,12 +24,16 @@ reales de su ejecución local y en AWS.
 | 07 | Lift-and-Shift | Erik | ✅ Completado | [README](07-lift-and-shift/README.md) |
 | 08 | Bastion Host | César | ⏳ Pendiente | [README](08-bastion/README.md) |
 
+\* El Laboratorio 02 estaba asignado inicialmente a César. Erik asumió su
+implementación para completar el laboratorio, sin modificar los laboratorios
+03, 06 ni 08.
+
 ## Equipo y responsabilidades
 
 | Integrante | Laboratorios |
 |---|---|
-| Erik | 01, 04, 05, 07 |
-| César | 02, 03, 06, 08 |
+| Erik | 01, 02, 04, 05, 07 |
+| César | 03, 06, 08 |
 
 ## Laboratorio 01 — Circuit Breaker
 
@@ -55,6 +59,36 @@ Documentación completa: [README del laboratorio](01-circuit-breaker/README.md),
 [arquitectura](01-circuit-breaker/ARQUITECTURA.md) e
 [informe](01-circuit-breaker/INFORME.md).
 
+## Laboratorio 02 — Retry
+
+Implementación completa con dos microservicios FastAPI, Tenacity, Docker
+Compose y Amazon ECS Fargate. Demuestra la recuperación tras dos fallos
+transitorios, el límite de tres intentos, el exponential backoff y la
+exclusión de HTTP 400 de los reintentos.
+
+| Resultado | Evidencia |
+|---|---|
+| 25 pruebas aprobadas | [01-pytest.txt](02-retry/evidencias/01-pytest.txt) |
+| Dos contenedores Docker | [02-docker-ps.txt](02-retry/evidencias/02-docker-ps.txt) |
+| Operación normal | [03-normal-operation.txt](02-retry/evidencias/03-normal-operation.txt) |
+| Recuperación 503 → 503 → 200 | [04-retry-recovery.txt](02-retry/evidencias/04-retry-recovery.txt) |
+| Agotamiento de intentos | [05-retry-exhausted.txt](02-retry/evidencias/05-retry-exhausted.txt) |
+| HTTP 400 sin reintentos | [06-no-retry-400.txt](02-retry/evidencias/06-no-retry-400.txt) |
+| Exponential Backoff | [07-exponential-backoff.txt](02-retry/evidencias/07-exponential-backoff.txt) |
+| Contadores del backend | [08-backend-stats.txt](02-retry/evidencias/08-backend-stats.txt) |
+| Terraform validado y aplicado | [09](02-retry/evidencias/09-terraform-validate.txt) · [10](02-retry/evidencias/10-terraform-plan.txt) · [11](02-retry/evidencias/11-terraform-apply.txt) |
+| Servicio ECS Fargate | [12-ecs.png](02-retry/evidencias/12-ecs.png) · [12-ecs.txt](02-retry/evidencias/12-ecs.txt) |
+| Demo real en AWS | [13-aws-demo.txt](02-retry/evidencias/13-aws-demo.txt) |
+| Logs de CloudWatch | [14-cloudwatch.txt](02-retry/evidencias/14-cloudwatch.txt) |
+| Destrucción de recursos | [15-terraform-destroy.txt](02-retry/evidencias/15-terraform-destroy.txt) |
+
+`12-ecs.png` es un renderizado de la salida real de AWS CLI guardada en
+`12-ecs.txt`, no una captura de la consola web.
+
+Documentación completa: [README del laboratorio](02-retry/README.md),
+[arquitectura](02-retry/ARQUITECTURA.md) e
+[informe](02-retry/INFORME.md). Integración: [PR #11](https://github.com/L4Ta-10001001/cloud-patterns-lab/pull/11).
+
 ## Laboratorios 04, 05 y 07
 
 | Lab | Implementación | Estado |
@@ -68,7 +102,7 @@ Documentación completa: [README del laboratorio](01-circuit-breaker/README.md),
 ```text
 cloud-patterns-lab/
 ├── 01-circuit-breaker/      # FastAPI + PyBreaker + Docker + ECS Fargate
-├── 02-retry/                # Pendiente (César)
+├── 02-retry/                # FastAPI + Tenacity + Docker + ECS Fargate
 ├── 03-timeout/              # Pendiente (César)
 ├── 04-serverless-docker/    # Lambda + ECR + ECS Fargate
 ├── 05-gateway-lb-proxy/     # API Gateway + ALB + NGINX
@@ -83,8 +117,8 @@ pruebas y carpeta `evidencias/`.
 ## Tecnologías
 
 AWS (Lambda, ECR, ECS Fargate, EC2, API Gateway, ALB, CloudWatch), Terraform,
-Docker y Docker Compose, Python 3.12, FastAPI, PyBreaker, HTTPX, Pytest,
-NGINX, Git y GitHub.
+Docker y Docker Compose, Python 3.12, FastAPI, PyBreaker, Tenacity, HTTPX,
+Pytest, NGINX, Git y GitHub.
 
 ## Evidencias y buenas prácticas
 
@@ -102,6 +136,10 @@ NGINX, Git y GitHub.
 - **Lab01:** 7 recursos destruidos; servicio ECS `INACTIVE`; sin ECR, log
   groups ni Security Group del laboratorio. Clúster, VPC, subredes y `LabRole`
   compartidos intactos.
+- **Lab02:** 6 recursos runtime y 2 repositorios ECR destruidos; servicio y
+  clúster ECS `INACTIVE`, sin tareas, log groups ni Security Group del
+  laboratorio. Task definition `INACTIVE` y VPC/subredes/`LabRole` compartidos
+  intactos.
 - **Lab04:** servicio ECS `cloudlab-erik-api` en `desired=0`, `running=0`.
 - **Lab05:** infraestructura desactivada mediante variables locales.
 - **Lab07:** instancia EC2 terminada y recursos destruidos; VM local apagada.
@@ -114,6 +152,19 @@ evidencias. Para el Laboratorio 01:
 
 ```bash
 cd 01-circuit-breaker
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m pytest -v
+docker compose up --build -d
+bash scripts/demo.sh
+docker compose down
+```
+
+Para el Laboratorio 02:
+
+```bash
+cd 02-retry
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
@@ -139,4 +190,5 @@ Cada laboratorio incluye:
 - Documentación de AWS: <https://docs.aws.amazon.com/>
 - Terraform AWS Provider: <https://registry.terraform.io/providers/hashicorp/aws/latest>
 - PyBreaker: <https://github.com/danielfm/pybreaker>
+- Tenacity: <https://tenacity.readthedocs.io/>
 - FastAPI: <https://fastapi.tiangolo.com/>

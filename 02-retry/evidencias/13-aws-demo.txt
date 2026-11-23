@@ -1,0 +1,1278 @@
+# 13 - Demostracion del patron Retry en AWS ECS Fargate
+Fecha: 2026-11-22T20:17:13-05:00
+Region: us-east-1
+Cluster: cloudlab-erik-retry-cluster
+Servicio: cloudlab-erik-retry-service
+Tarea: arn:aws:ecs:us-east-1:533267299755:task/cloudlab-erik-retry-cluster/c8bb4686b9574b89a56a84292691b921
+IP publica: 13.218.98.224
+URL base: http://13.218.98.224:8000
+
+## Servicio ECS
+{
+    "status": "ACTIVE",
+    "desired": 1,
+    "running": 1,
+    "pending": 0,
+    "taskDefinition": "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry:1",
+    "launchType": "FARGATE"
+}
+
+## Tarea ECS
+{
+    "lastStatus": "RUNNING",
+    "healthStatus": "HEALTHY",
+    "containers": [
+        {
+            "name": "backend",
+            "lastStatus": "RUNNING",
+            "healthStatus": "HEALTHY"
+        },
+        {
+            "name": "client",
+            "lastStatus": "RUNNING",
+            "healthStatus": "HEALTHY"
+        }
+    ]
+}
+
+## Salida de scripts/demo.sh
+Cliente listo en http://13.218.98.224:8000 (intento 1)
+# 03 - Operacion normal: un solo intento, sin reintentos
+Fecha: 2026-11-22T20:17:04-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=success&run_id=aws-20261122-201644-normal"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-normal",
+    "scenario": "success",
+    "attempts": 1,
+    "retries": 0,
+    "recovered": false,
+    "http_status": 200,
+    "waits": [],
+    "total_elapsed": 0.073,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0724,
+            "timestamp": 1795396624.213968,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-normal",
+                "scenario": "success",
+                "request_number": 1,
+                "http_status": 200,
+                "timestamp": 1795396624.2118495,
+                "message": "Operacion exitosa"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-normal",
+        "scenario": "success",
+        "request_number": 1,
+        "http_status": 200,
+        "timestamp": 1795396624.2118495,
+        "message": "Operacion exitosa"
+    },
+    "error": null
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-normal"
+{
+    "run_id": "aws-20261122-201644-normal",
+    "total_requests": 1,
+    "failed_requests": 0,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "success",
+            "status_code": 200,
+            "timestamp": 1795396624.2118473
+        }
+    ],
+    "created_at": 1795396624.2118423
+}
+OK: http_status=200 attempts=1 retries=0 recovered=False waits=[]
+# 04 - Recuperacion: 503, 503 y 200 en el tercer intento
+Fecha: 2026-11-22T20:17:06-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=transient&run_id=aws-20261122-201644-transient"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-transient",
+    "scenario": "transient",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": true,
+    "http_status": 200,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.535,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0132,
+            "timestamp": 1795396624.9141965,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-transient",
+                "scenario": "transient",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795396624.9126935,
+                "message": "Fallo transitorio 1/2",
+                "failures_remaining": 1
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0107,
+            "timestamp": 1795396625.4253204,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-transient",
+                "scenario": "transient",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795396625.4239962,
+                "message": "Fallo transitorio 2/2",
+                "failures_remaining": 0
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0101,
+            "timestamp": 1795396626.4358325,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-transient",
+                "scenario": "transient",
+                "request_number": 3,
+                "http_status": 200,
+                "timestamp": 1795396626.4344804,
+                "message": "Recuperado despues de fallos transitorios",
+                "failures_remaining": 0
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-transient",
+        "scenario": "transient",
+        "request_number": 3,
+        "http_status": 200,
+        "timestamp": 1795396626.4344804,
+        "message": "Recuperado despues de fallos transitorios",
+        "failures_remaining": 0
+    },
+    "error": null
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-transient"
+{
+    "run_id": "aws-20261122-201644-transient",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396624.9126914
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396625.4239945
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795396626.4344785
+        }
+    ],
+    "created_at": 1795396624.9126835
+}
+OK: http_status=200 attempts=3 retries=2 recovered=True waits=[0.5, 1.0]
+# 05 - Agotamiento: tres intentos y error final controlado
+Fecha: 2026-11-22T20:17:08-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=permanent&run_id=aws-20261122-201644-permanent"
+HTTP 503
+{
+    "status": "failed",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-permanent",
+    "scenario": "permanent",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": false,
+    "http_status": 503,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.543,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0178,
+            "timestamp": 1795396627.0813794,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-permanent",
+                "scenario": "permanent",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795396627.0794654,
+                "message": "Fallo permanente simulado"
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0117,
+            "timestamp": 1795396627.5937731,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-permanent",
+                "scenario": "permanent",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795396627.5922377,
+                "message": "Fallo permanente simulado"
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.012,
+            "timestamp": 1795396628.6061769,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-permanent",
+                "scenario": "permanent",
+                "request_number": 3,
+                "http_status": 503,
+                "timestamp": 1795396628.6047835,
+                "message": "Fallo permanente simulado"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "error",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-permanent",
+        "scenario": "permanent",
+        "request_number": 3,
+        "http_status": 503,
+        "timestamp": 1795396628.6047835,
+        "message": "Fallo permanente simulado"
+    },
+    "error": "HTTP 503 del backend"
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-permanent"
+{
+    "run_id": "aws-20261122-201644-permanent",
+    "total_requests": 3,
+    "failed_requests": 3,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.0794635
+        },
+        {
+            "attempt": 2,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.5922365
+        },
+        {
+            "attempt": 3,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396628.604782
+        }
+    ],
+    "created_at": 1795396627.079458
+}
+OK: http_status=503 attempts=3 retries=2 recovered=False waits=[0.5, 1.0]
+# 06 - Error no reintentable: HTTP 400 con un solo intento
+Fecha: 2026-11-22T20:17:09-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=bad_request&run_id=aws-20261122-201644-bad"
+HTTP 400
+{
+    "status": "failed",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-bad",
+    "scenario": "bad_request",
+    "attempts": 1,
+    "retries": 0,
+    "recovered": false,
+    "http_status": 400,
+    "waits": [],
+    "total_elapsed": 0.019,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "non_retryable_error",
+            "http_status": 400,
+            "elapsed": 0.0192,
+            "timestamp": 1795396629.2829206,
+            "error": "HTTP 400 del backend (no reintentable)",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-bad",
+                "scenario": "bad_request",
+                "request_number": 1,
+                "http_status": 400,
+                "timestamp": 1795396629.2734447,
+                "message": "Solicitud invalida: no reintentar"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "error",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-bad",
+        "scenario": "bad_request",
+        "request_number": 1,
+        "http_status": 400,
+        "timestamp": 1795396629.2734447,
+        "message": "Solicitud invalida: no reintentar"
+    },
+    "error": "HTTP 400 del backend (no reintentable)"
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-bad"
+{
+    "run_id": "aws-20261122-201644-bad",
+    "total_requests": 1,
+    "failed_requests": 1,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "bad_request",
+            "status_code": 400,
+            "timestamp": 1795396629.273443
+        }
+    ],
+    "created_at": 1795396629.2734382
+}
+OK: http_status=400 attempts=1 retries=0 recovered=False waits=[]
+# 07 - Exponential Backoff: esperas progresivas entre intentos
+Fecha: 2026-11-22T20:17:11-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=transient&run_id=aws-20261122-201644-backoff"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-backoff",
+    "scenario": "transient",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": true,
+    "http_status": 200,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.542,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0103,
+            "timestamp": 1795396629.9630597,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-backoff",
+                "scenario": "transient",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795396629.9617026,
+                "message": "Fallo transitorio 1/2",
+                "failures_remaining": 1
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0183,
+            "timestamp": 1795396630.4817333,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-backoff",
+                "scenario": "transient",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795396630.4793155,
+                "message": "Fallo transitorio 2/2",
+                "failures_remaining": 0
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0118,
+            "timestamp": 1795396631.4944308,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-backoff",
+                "scenario": "transient",
+                "request_number": 3,
+                "http_status": 200,
+                "timestamp": 1795396631.492953,
+                "message": "Recuperado despues de fallos transitorios",
+                "failures_remaining": 0
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-backoff",
+        "scenario": "transient",
+        "request_number": 3,
+        "http_status": 200,
+        "timestamp": 1795396631.492953,
+        "message": "Recuperado despues de fallos transitorios",
+        "failures_remaining": 0
+    },
+    "error": null
+}
+
+Esperas configuradas (waits): [0.5, 1.0]
+Intervalos reales entre intentos (s): [0.519, 1.013]
+OK: el intervalo crece de ~0.5 s a ~1.0 s
+OK: http_status=200 attempts=3 retries=2 recovered=True waits=[0.5, 1.0]
+# 08 - Contadores del backend por run_id
+Fecha: 2026-11-22T20:17:12-05:00
+
+## normal (aws-20261122-201644-normal)
+{
+    "run_id": "aws-20261122-201644-normal",
+    "total_requests": 1,
+    "failed_requests": 0,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "success",
+            "status_code": 200,
+            "timestamp": 1795396624.2118473
+        }
+    ],
+    "created_at": 1795396624.2118423
+}
+
+## transient (aws-20261122-201644-transient)
+{
+    "run_id": "aws-20261122-201644-transient",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396624.9126914
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396625.4239945
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795396626.4344785
+        }
+    ],
+    "created_at": 1795396624.9126835
+}
+
+## permanent (aws-20261122-201644-permanent)
+{
+    "run_id": "aws-20261122-201644-permanent",
+    "total_requests": 3,
+    "failed_requests": 3,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.0794635
+        },
+        {
+            "attempt": 2,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.5922365
+        },
+        {
+            "attempt": 3,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396628.604782
+        }
+    ],
+    "created_at": 1795396627.079458
+}
+
+## bad_request (aws-20261122-201644-bad)
+{
+    "run_id": "aws-20261122-201644-bad",
+    "total_requests": 1,
+    "failed_requests": 1,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "bad_request",
+            "status_code": 400,
+            "timestamp": 1795396629.273443
+        }
+    ],
+    "created_at": 1795396629.2734382
+}
+
+## backoff (aws-20261122-201644-backoff)
+{
+    "run_id": "aws-20261122-201644-backoff",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396629.9617007
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396630.4793136
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795396631.4929514
+        }
+    ],
+    "created_at": 1795396629.961695
+}
+
+## Verificacion
+OK 08-normal.json: total=1 statuses=[200]
+OK 08-transient.json: total=3 statuses=[503, 503, 200]
+OK 08-permanent.json: total=3 statuses=[503, 503, 503]
+OK 08-bad.json: total=1 statuses=[400]
+OK 08-backoff.json: total=3 statuses=[503, 503, 200]
+OK: total=1 failed=0 successful=1 statuses=[200]
+OK: total=3 failed=2 successful=1 statuses=[503, 503, 200]
+OK: total=3 failed=3 successful=0 statuses=[503, 503, 503]
+OK: total=1 failed=1 successful=0 statuses=[400]
+OK: total=3 failed=2 successful=1 statuses=[503, 503, 200]
+
+Demostracion completada. Evidencias generadas en /tmp/tmp.YMPUc6bePs/evidencias/
+
+## 03-normal-operation.txt
+# 03 - Operacion normal: un solo intento, sin reintentos
+Fecha: 2026-11-22T20:17:04-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=success&run_id=aws-20261122-201644-normal"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-normal",
+    "scenario": "success",
+    "attempts": 1,
+    "retries": 0,
+    "recovered": false,
+    "http_status": 200,
+    "waits": [],
+    "total_elapsed": 0.073,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0724,
+            "timestamp": 1795396624.213968,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-normal",
+                "scenario": "success",
+                "request_number": 1,
+                "http_status": 200,
+                "timestamp": 1795396624.2118495,
+                "message": "Operacion exitosa"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-normal",
+        "scenario": "success",
+        "request_number": 1,
+        "http_status": 200,
+        "timestamp": 1795396624.2118495,
+        "message": "Operacion exitosa"
+    },
+    "error": null
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-normal"
+{
+    "run_id": "aws-20261122-201644-normal",
+    "total_requests": 1,
+    "failed_requests": 0,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "success",
+            "status_code": 200,
+            "timestamp": 1795396624.2118473
+        }
+    ],
+    "created_at": 1795396624.2118423
+}
+
+## 04-retry-recovery.txt
+# 04 - Recuperacion: 503, 503 y 200 en el tercer intento
+Fecha: 2026-11-22T20:17:06-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=transient&run_id=aws-20261122-201644-transient"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-transient",
+    "scenario": "transient",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": true,
+    "http_status": 200,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.535,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0132,
+            "timestamp": 1795396624.9141965,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-transient",
+                "scenario": "transient",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795396624.9126935,
+                "message": "Fallo transitorio 1/2",
+                "failures_remaining": 1
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0107,
+            "timestamp": 1795396625.4253204,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-transient",
+                "scenario": "transient",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795396625.4239962,
+                "message": "Fallo transitorio 2/2",
+                "failures_remaining": 0
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0101,
+            "timestamp": 1795396626.4358325,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-transient",
+                "scenario": "transient",
+                "request_number": 3,
+                "http_status": 200,
+                "timestamp": 1795396626.4344804,
+                "message": "Recuperado despues de fallos transitorios",
+                "failures_remaining": 0
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-transient",
+        "scenario": "transient",
+        "request_number": 3,
+        "http_status": 200,
+        "timestamp": 1795396626.4344804,
+        "message": "Recuperado despues de fallos transitorios",
+        "failures_remaining": 0
+    },
+    "error": null
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-transient"
+{
+    "run_id": "aws-20261122-201644-transient",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396624.9126914
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396625.4239945
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795396626.4344785
+        }
+    ],
+    "created_at": 1795396624.9126835
+}
+
+## 05-retry-exhausted.txt
+# 05 - Agotamiento: tres intentos y error final controlado
+Fecha: 2026-11-22T20:17:08-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=permanent&run_id=aws-20261122-201644-permanent"
+HTTP 503
+{
+    "status": "failed",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-permanent",
+    "scenario": "permanent",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": false,
+    "http_status": 503,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.543,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0178,
+            "timestamp": 1795396627.0813794,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-permanent",
+                "scenario": "permanent",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795396627.0794654,
+                "message": "Fallo permanente simulado"
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0117,
+            "timestamp": 1795396627.5937731,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-permanent",
+                "scenario": "permanent",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795396627.5922377,
+                "message": "Fallo permanente simulado"
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.012,
+            "timestamp": 1795396628.6061769,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-permanent",
+                "scenario": "permanent",
+                "request_number": 3,
+                "http_status": 503,
+                "timestamp": 1795396628.6047835,
+                "message": "Fallo permanente simulado"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "error",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-permanent",
+        "scenario": "permanent",
+        "request_number": 3,
+        "http_status": 503,
+        "timestamp": 1795396628.6047835,
+        "message": "Fallo permanente simulado"
+    },
+    "error": "HTTP 503 del backend"
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-permanent"
+{
+    "run_id": "aws-20261122-201644-permanent",
+    "total_requests": 3,
+    "failed_requests": 3,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.0794635
+        },
+        {
+            "attempt": 2,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.5922365
+        },
+        {
+            "attempt": 3,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396628.604782
+        }
+    ],
+    "created_at": 1795396627.079458
+}
+
+## 06-no-retry-400.txt
+# 06 - Error no reintentable: HTTP 400 con un solo intento
+Fecha: 2026-11-22T20:17:09-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=bad_request&run_id=aws-20261122-201644-bad"
+HTTP 400
+{
+    "status": "failed",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-bad",
+    "scenario": "bad_request",
+    "attempts": 1,
+    "retries": 0,
+    "recovered": false,
+    "http_status": 400,
+    "waits": [],
+    "total_elapsed": 0.019,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "non_retryable_error",
+            "http_status": 400,
+            "elapsed": 0.0192,
+            "timestamp": 1795396629.2829206,
+            "error": "HTTP 400 del backend (no reintentable)",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-bad",
+                "scenario": "bad_request",
+                "request_number": 1,
+                "http_status": 400,
+                "timestamp": 1795396629.2734447,
+                "message": "Solicitud invalida: no reintentar"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "error",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-bad",
+        "scenario": "bad_request",
+        "request_number": 1,
+        "http_status": 400,
+        "timestamp": 1795396629.2734447,
+        "message": "Solicitud invalida: no reintentar"
+    },
+    "error": "HTTP 400 del backend (no reintentable)"
+}
+
+$ curl -sS "http://13.218.98.224:8000/backend/stats?run_id=aws-20261122-201644-bad"
+{
+    "run_id": "aws-20261122-201644-bad",
+    "total_requests": 1,
+    "failed_requests": 1,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "bad_request",
+            "status_code": 400,
+            "timestamp": 1795396629.273443
+        }
+    ],
+    "created_at": 1795396629.2734382
+}
+
+## 07-exponential-backoff.txt
+# 07 - Exponential Backoff: esperas progresivas entre intentos
+Fecha: 2026-11-22T20:17:11-05:00
+URL base: http://13.218.98.224:8000
+
+$ curl -sS "http://13.218.98.224:8000/request?scenario=transient&run_id=aws-20261122-201644-backoff"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "aws-20261122-201644-backoff",
+    "scenario": "transient",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": true,
+    "http_status": 200,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.542,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0103,
+            "timestamp": 1795396629.9630597,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-backoff",
+                "scenario": "transient",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795396629.9617026,
+                "message": "Fallo transitorio 1/2",
+                "failures_remaining": 1
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0183,
+            "timestamp": 1795396630.4817333,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-backoff",
+                "scenario": "transient",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795396630.4793155,
+                "message": "Fallo transitorio 2/2",
+                "failures_remaining": 0
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0118,
+            "timestamp": 1795396631.4944308,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "aws-20261122-201644-backoff",
+                "scenario": "transient",
+                "request_number": 3,
+                "http_status": 200,
+                "timestamp": 1795396631.492953,
+                "message": "Recuperado despues de fallos transitorios",
+                "failures_remaining": 0
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "aws-20261122-201644-backoff",
+        "scenario": "transient",
+        "request_number": 3,
+        "http_status": 200,
+        "timestamp": 1795396631.492953,
+        "message": "Recuperado despues de fallos transitorios",
+        "failures_remaining": 0
+    },
+    "error": null
+}
+
+Esperas configuradas (waits): [0.5, 1.0]
+Intervalos reales entre intentos (s): [0.519, 1.013]
+OK: el intervalo crece de ~0.5 s a ~1.0 s
+
+## 08-backend-stats.txt
+# 08 - Contadores del backend por run_id
+Fecha: 2026-11-22T20:17:12-05:00
+
+## normal (aws-20261122-201644-normal)
+{
+    "run_id": "aws-20261122-201644-normal",
+    "total_requests": 1,
+    "failed_requests": 0,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "success",
+            "status_code": 200,
+            "timestamp": 1795396624.2118473
+        }
+    ],
+    "created_at": 1795396624.2118423
+}
+
+## transient (aws-20261122-201644-transient)
+{
+    "run_id": "aws-20261122-201644-transient",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396624.9126914
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396625.4239945
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795396626.4344785
+        }
+    ],
+    "created_at": 1795396624.9126835
+}
+
+## permanent (aws-20261122-201644-permanent)
+{
+    "run_id": "aws-20261122-201644-permanent",
+    "total_requests": 3,
+    "failed_requests": 3,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.0794635
+        },
+        {
+            "attempt": 2,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396627.5922365
+        },
+        {
+            "attempt": 3,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795396628.604782
+        }
+    ],
+    "created_at": 1795396627.079458
+}
+
+## bad_request (aws-20261122-201644-bad)
+{
+    "run_id": "aws-20261122-201644-bad",
+    "total_requests": 1,
+    "failed_requests": 1,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "bad_request",
+            "status_code": 400,
+            "timestamp": 1795396629.273443
+        }
+    ],
+    "created_at": 1795396629.2734382
+}
+
+## backoff (aws-20261122-201644-backoff)
+{
+    "run_id": "aws-20261122-201644-backoff",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396629.9617007
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795396630.4793136
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795396631.4929514
+        }
+    ],
+    "created_at": 1795396629.961695
+}
+
+## Verificacion
+OK 08-normal.json: total=1 statuses=[200]
+OK 08-transient.json: total=3 statuses=[503, 503, 200]
+OK 08-permanent.json: total=3 statuses=[503, 503, 503]
+OK 08-bad.json: total=1 statuses=[400]
+OK 08-backoff.json: total=3 statuses=[503, 503, 200]
+

@@ -1,0 +1,130 @@
+# 08 - Contadores del backend por run_id
+Fecha: 2026-11-22T20:04:21-05:00
+
+## normal (demo-20261122-200416-normal)
+{
+    "run_id": "demo-20261122-200416-normal",
+    "total_requests": 1,
+    "failed_requests": 0,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "success",
+            "status_code": 200,
+            "timestamp": 1795395856.091426
+        }
+    ],
+    "created_at": 1795395856.091423
+}
+
+## transient (demo-20261122-200416-transient)
+{
+    "run_id": "demo-20261122-200416-transient",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795395856.2713513
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795395856.792048
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795395857.827415
+        }
+    ],
+    "created_at": 1795395856.2713478
+}
+
+## permanent (demo-20261122-200416-permanent)
+{
+    "run_id": "demo-20261122-200416-permanent",
+    "total_requests": 3,
+    "failed_requests": 3,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795395857.9826713
+        },
+        {
+            "attempt": 2,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795395858.4913764
+        },
+        {
+            "attempt": 3,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795395859.507232
+        }
+    ],
+    "created_at": 1795395857.982668
+}
+
+## bad_request (demo-20261122-200416-bad)
+{
+    "run_id": "demo-20261122-200416-bad",
+    "total_requests": 1,
+    "failed_requests": 1,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "bad_request",
+            "status_code": 400,
+            "timestamp": 1795395859.6702254
+        }
+    ],
+    "created_at": 1795395859.6702213
+}
+
+## backoff (demo-20261122-200416-backoff)
+{
+    "run_id": "demo-20261122-200416-backoff",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795395859.857115
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795395860.369409
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795395861.4005117
+        }
+    ],
+    "created_at": 1795395859.8571107
+}
+
+## Verificacion
+OK 08-normal.json: total=1 statuses=[200]
+OK 08-transient.json: total=3 statuses=[503, 503, 200]
+OK 08-permanent.json: total=3 statuses=[503, 503, 503]
+OK 08-bad.json: total=1 statuses=[400]
+OK 08-backoff.json: total=3 statuses=[503, 503, 200]

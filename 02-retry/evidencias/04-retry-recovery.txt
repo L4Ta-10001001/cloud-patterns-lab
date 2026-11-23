@@ -1,0 +1,124 @@
+# 04 - Recuperacion: 503, 503 y 200 en el tercer intento
+Fecha: 2026-11-22T20:04:17-05:00
+URL base: http://127.0.0.1:8092
+
+$ curl -sS "http://127.0.0.1:8092/request?scenario=transient&run_id=demo-20261122-200416-transient"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "demo-20261122-200416-transient",
+    "scenario": "transient",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": true,
+    "http_status": 200,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.577,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0203,
+            "timestamp": 1795395856.2725496,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-transient",
+                "scenario": "transient",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795395856.2713528,
+                "message": "Fallo transitorio 1/2",
+                "failures_remaining": 1
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0204,
+            "timestamp": 1795395856.7932632,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-transient",
+                "scenario": "transient",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795395856.7920492,
+                "message": "Fallo transitorio 2/2",
+                "failures_remaining": 0
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0353,
+            "timestamp": 1795395857.8292484,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-transient",
+                "scenario": "transient",
+                "request_number": 3,
+                "http_status": 200,
+                "timestamp": 1795395857.8274176,
+                "message": "Recuperado despues de fallos transitorios",
+                "failures_remaining": 0
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "demo-20261122-200416-transient",
+        "scenario": "transient",
+        "request_number": 3,
+        "http_status": 200,
+        "timestamp": 1795395857.8274176,
+        "message": "Recuperado despues de fallos transitorios",
+        "failures_remaining": 0
+    },
+    "error": null
+}
+
+$ curl -sS "http://127.0.0.1:8092/backend/stats?run_id=demo-20261122-200416-transient"
+{
+    "run_id": "demo-20261122-200416-transient",
+    "total_requests": 3,
+    "failed_requests": 2,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795395856.2713513
+        },
+        {
+            "attempt": 2,
+            "scenario": "transient",
+            "status_code": 503,
+            "timestamp": 1795395856.792048
+        },
+        {
+            "attempt": 3,
+            "scenario": "transient",
+            "status_code": 200,
+            "timestamp": 1795395857.827415
+        }
+    ],
+    "created_at": 1795395856.2713478
+}

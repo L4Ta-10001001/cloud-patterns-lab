@@ -1,0 +1,6 @@
+# 02 - Contenedores Docker en ejecucion
+Fecha: 2026-11-22T20:04:15-05:00
+
+NAME            IMAGE              COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+lab02-backend   02-retry-backend   "uvicorn main:app --…"   backend   16 seconds ago   Up 14 seconds (healthy)   8001/tcp
+lab02-client    02-retry-client    "uvicorn main:app --…"   client    16 seconds ago   Up 9 seconds (healthy)    127.0.0.1:8092->8000/tcp
