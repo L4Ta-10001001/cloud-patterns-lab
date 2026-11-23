@@ -1,0 +1,67 @@
+# 03 - Operacion normal: un solo intento, sin reintentos
+Fecha: 2026-11-22T20:04:16-05:00
+URL base: http://127.0.0.1:8092
+
+$ curl -sS "http://127.0.0.1:8092/request?scenario=success&run_id=demo-20261122-200416-normal"
+HTTP 200
+{
+    "status": "success",
+    "service": "retry-client",
+    "run_id": "demo-20261122-200416-normal",
+    "scenario": "success",
+    "attempts": 1,
+    "retries": 0,
+    "recovered": false,
+    "http_status": 200,
+    "waits": [],
+    "total_elapsed": 0.01,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "success",
+            "http_status": 200,
+            "elapsed": 0.0103,
+            "timestamp": 1795395856.0923796,
+            "error": null,
+            "retry_after": null,
+            "response_body": {
+                "status": "ok",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-normal",
+                "scenario": "success",
+                "request_number": 1,
+                "http_status": 200,
+                "timestamp": 1795395856.0914276,
+                "message": "Operacion exitosa"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "ok",
+        "service": "retry-backend",
+        "run_id": "demo-20261122-200416-normal",
+        "scenario": "success",
+        "request_number": 1,
+        "http_status": 200,
+        "timestamp": 1795395856.0914276,
+        "message": "Operacion exitosa"
+    },
+    "error": null
+}
+
+$ curl -sS "http://127.0.0.1:8092/backend/stats?run_id=demo-20261122-200416-normal"
+{
+    "run_id": "demo-20261122-200416-normal",
+    "total_requests": 1,
+    "failed_requests": 0,
+    "successful_requests": 1,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "success",
+            "status_code": 200,
+            "timestamp": 1795395856.091426
+        }
+    ],
+    "created_at": 1795395856.091423
+}

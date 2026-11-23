@@ -1,0 +1,56 @@
+services:
+  backend:
+    build: ./backend
+    container_name: lab02-backend
+    environment:
+      LOG_LEVEL: INFO
+    expose:
+      - "8001"
+    networks:
+      - lab02
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')",
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+      start_period: 5s
+
+  client:
+    build: ./client
+    container_name: lab02-client
+    environment:
+      BACKEND_URL: http://backend:8001
+      RETRY_MAX_ATTEMPTS: "3"
+      RETRY_INITIAL_WAIT: "0.5"
+      RETRY_MAX_WAIT: "2.0"
+      HTTP_TIMEOUT: "2.0"
+      LOG_LEVEL: INFO
+    ports:
+      - "127.0.0.1:8092:8000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - lab02
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')",
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+      start_period: 5s
+
+networks:
+  lab02:
+    driver: bridge

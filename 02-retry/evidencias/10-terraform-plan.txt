@@ -1,0 +1,421 @@
+# 10 - Planes de Terraform
+Fecha: 2026-11-22T20:16:23-05:00
+Region: us-east-1
+IP autorizada: 157.100.142.229/32
+
+## terraform/ecr
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_ecr_repository.this["backend"] will be created
+  + resource "aws_ecr_repository" "this" {
+      + arn                  = (known after apply)
+      + id                   = (known after apply)
+      + image_tag_mutability = "MUTABLE"
+      + name                 = "cloudlab-erik-retry-backend"
+      + region               = "us-east-1"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "Lab"     = "02-retry"
+          + "Service" = "backend"
+        }
+      + tags_all             = {
+          + "Lab"     = "02-retry"
+          + "Service" = "backend"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+  # aws_ecr_repository.this["client"] will be created
+  + resource "aws_ecr_repository" "this" {
+      + arn                  = (known after apply)
+      + id                   = (known after apply)
+      + image_tag_mutability = "MUTABLE"
+      + name                 = "cloudlab-erik-retry-client"
+      + region               = "us-east-1"
+      + registry_id          = (known after apply)
+      + repository_url       = (known after apply)
+      + tags                 = {
+          + "Lab"     = "02-retry"
+          + "Service" = "client"
+        }
+      + tags_all             = {
+          + "Lab"     = "02-retry"
+          + "Service" = "client"
+        }
+
+      + encryption_configuration {
+          + encryption_type = "AES256"
+          + kms_key         = (known after apply)
+        }
+
+      + image_scanning_configuration {
+          + scan_on_push = true
+        }
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + backend_repository_name = "cloudlab-erik-retry-backend"
+  + backend_repository_url  = (known after apply)
+  + client_repository_name  = "cloudlab-erik-retry-client"
+  + client_repository_url   = (known after apply)
+  + image_tag               = "v1"
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+
+## terraform/runtime
+data.aws_iam_role.execution: Reading...
+data.aws_region.current: Reading...
+data.aws_vpc.default[0]: Reading...
+data.aws_iam_role.task: Reading...
+data.aws_caller_identity.current: Reading...
+data.aws_region.current: Read complete after 0s [id=us-east-1]
+data.aws_caller_identity.current: Read complete after 0s [id=533267299755]
+data.aws_iam_role.execution: Read complete after 0s [id=LabRole]
+data.aws_iam_role.task: Read complete after 0s [id=LabRole]
+data.aws_vpc.default[0]: Read complete after 1s [id=vpc-0bfdd39b2f8f6f14b]
+data.aws_vpc.selected: Reading...
+data.aws_vpc.selected: Read complete after 1s [id=vpc-0bfdd39b2f8f6f14b]
+data.aws_subnets.default[0]: Reading...
+data.aws_subnets.default[0]: Read complete after 0s [id=us-east-1]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_cloudwatch_log_group.backend will be created
+  + resource "aws_cloudwatch_log_group" "backend" {
+      + arn                         = (known after apply)
+      + deletion_protection_enabled = (known after apply)
+      + id                          = (known after apply)
+      + log_group_class             = (known after apply)
+      + name                        = "/ecs/cloudlab-erik-retry-backend"
+      + name_prefix                 = (known after apply)
+      + region                      = "us-east-1"
+      + retention_in_days           = 3
+      + skip_destroy                = false
+      + tags                        = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + tags_all                    = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+    }
+
+  # aws_cloudwatch_log_group.client will be created
+  + resource "aws_cloudwatch_log_group" "client" {
+      + arn                         = (known after apply)
+      + deletion_protection_enabled = (known after apply)
+      + id                          = (known after apply)
+      + log_group_class             = (known after apply)
+      + name                        = "/ecs/cloudlab-erik-retry-client"
+      + name_prefix                 = (known after apply)
+      + region                      = "us-east-1"
+      + retention_in_days           = 3
+      + skip_destroy                = false
+      + tags                        = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + tags_all                    = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+    }
+
+  # aws_ecs_cluster.this[0] will be created
+  + resource "aws_ecs_cluster" "this" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + name     = "cloudlab-erik-retry-cluster"
+      + region   = "us-east-1"
+      + tags     = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + tags_all = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+
+      + setting {
+          + name  = "containerInsights"
+          + value = "disabled"
+        }
+    }
+
+  # aws_ecs_service.this will be created
+  + resource "aws_ecs_service" "this" {
+      + arn                                = (known after apply)
+      + availability_zone_rebalancing      = (known after apply)
+      + cluster                            = "cloudlab-erik-retry-cluster"
+      + deployment_maximum_percent         = 200
+      + deployment_minimum_healthy_percent = 100
+      + desired_count                      = 1
+      + enable_ecs_managed_tags            = false
+      + enable_execute_command             = false
+      + iam_role                           = (known after apply)
+      + id                                 = (known after apply)
+      + launch_type                        = "FARGATE"
+      + name                               = "cloudlab-erik-retry-service"
+      + platform_version                   = "LATEST"
+      + region                             = "us-east-1"
+      + scheduling_strategy                = "REPLICA"
+      + tags                               = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + tags_all                           = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + task_definition                    = (known after apply)
+      + triggers                           = (known after apply)
+      + wait_for_steady_state              = false
+
+      + deployment_circuit_breaker {
+          + enable   = true
+          + rollback = true
+        }
+
+      + deployment_configuration (known after apply)
+
+      + network_configuration {
+          + assign_public_ip = true
+          + security_groups  = (known after apply)
+          + subnets          = [
+              + "subnet-00c75f9aed20d38fa",
+              + "subnet-04da5e5b1df085bf0",
+              + "subnet-04dab9ed2b71261a0",
+              + "subnet-093fa2a5b495b57cf",
+              + "subnet-0b312bb3c8246f912",
+              + "subnet-0d1186cdb06fa5d98",
+            ]
+        }
+    }
+
+  # aws_ecs_task_definition.this will be created
+  + resource "aws_ecs_task_definition" "this" {
+      + arn                      = (known after apply)
+      + arn_without_revision     = (known after apply)
+      + container_definitions    = jsonencode(
+            [
+              + {
+                  + environment      = [
+                      + {
+                          + name  = "LOG_LEVEL"
+                          + value = "INFO"
+                        },
+                    ]
+                  + essential        = true
+                  + healthCheck      = {
+                      + command     = [
+                          + "CMD-SHELL",
+                          + "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8001/health\")'",
+                        ]
+                      + interval    = 15
+                      + retries     = 3
+                      + startPeriod = 10
+                      + timeout     = 5
+                    }
+                  + image            = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1"
+                  + logConfiguration = {
+                      + logDriver = "awslogs"
+                      + options   = {
+                          + awslogs-group         = "/ecs/cloudlab-erik-retry-backend"
+                          + awslogs-region        = "us-east-1"
+                          + awslogs-stream-prefix = "backend"
+                        }
+                    }
+                  + name             = "backend"
+                  + portMappings     = [
+                      + {
+                          + containerPort = 8001
+                          + hostPort      = 8001
+                          + protocol      = "tcp"
+                        },
+                    ]
+                },
+              + {
+                  + dependsOn        = [
+                      + {
+                          + condition     = "START"
+                          + containerName = "backend"
+                        },
+                    ]
+                  + environment      = [
+                      + {
+                          + name  = "BACKEND_URL"
+                          + value = "http://127.0.0.1:8001"
+                        },
+                      + {
+                          + name  = "HTTP_TIMEOUT"
+                          + value = "2.0"
+                        },
+                      + {
+                          + name  = "LOG_LEVEL"
+                          + value = "INFO"
+                        },
+                      + {
+                          + name  = "RETRY_INITIAL_WAIT"
+                          + value = "0.5"
+                        },
+                      + {
+                          + name  = "RETRY_MAX_ATTEMPTS"
+                          + value = "3"
+                        },
+                      + {
+                          + name  = "RETRY_MAX_WAIT"
+                          + value = "2.0"
+                        },
+                    ]
+                  + essential        = true
+                  + healthCheck      = {
+                      + command     = [
+                          + "CMD-SHELL",
+                          + "python -c 'import urllib.request; urllib.request.urlopen(\"http://127.0.0.1:8000/health\")'",
+                        ]
+                      + interval    = 15
+                      + retries     = 3
+                      + startPeriod = 10
+                      + timeout     = 5
+                    }
+                  + image            = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1"
+                  + logConfiguration = {
+                      + logDriver = "awslogs"
+                      + options   = {
+                          + awslogs-group         = "/ecs/cloudlab-erik-retry-client"
+                          + awslogs-region        = "us-east-1"
+                          + awslogs-stream-prefix = "client"
+                        }
+                    }
+                  + name             = "client"
+                  + portMappings     = [
+                      + {
+                          + containerPort = 8000
+                          + hostPort      = 8000
+                          + protocol      = "tcp"
+                        },
+                    ]
+                },
+            ]
+        )
+      + cpu                      = "512"
+      + enable_fault_injection   = (known after apply)
+      + execution_role_arn       = "arn:aws:iam::533267299755:role/LabRole"
+      + family                   = "cloudlab-erik-retry"
+      + id                       = (known after apply)
+      + memory                   = "1024"
+      + network_mode             = "awsvpc"
+      + region                   = "us-east-1"
+      + requires_compatibilities = [
+          + "FARGATE",
+        ]
+      + revision                 = (known after apply)
+      + skip_destroy             = false
+      + tags                     = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + tags_all                 = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + task_role_arn            = "arn:aws:iam::533267299755:role/LabRole"
+      + track_latest             = false
+    }
+
+  # aws_security_group.client will be created
+  + resource "aws_security_group" "client" {
+      + arn                    = (known after apply)
+      + description            = "Acceso HTTP al cliente Retry"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + description      = "Salida a internet y al backend interno"
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "157.100.142.229/32",
+                ]
+              + description      = "Cliente HTTP desde la IP autorizada"
+              + from_port        = 8000
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 8000
+            },
+        ]
+      + name                   = "cloudlab-erik-retry-client-sg"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + region                 = "us-east-1"
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + tags_all               = {
+          + "Lab"     = "02-retry"
+          + "Project" = "cloudlab-erik"
+        }
+      + vpc_id                 = "vpc-0bfdd39b2f8f6f14b"
+    }
+
+Plan: 6 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + backend_image       = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1"
+  + backend_log_group   = "/ecs/cloudlab-erik-retry-backend"
+  + client_image        = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1"
+  + client_log_group    = "/ecs/cloudlab-erik-retry-client"
+  + cluster_name        = "cloudlab-erik-retry-cluster"
+  + security_group_id   = (known after apply)
+  + service_name        = "cloudlab-erik-retry-service"
+  + task_definition_arn = (known after apply)
+  + task_lookup_command = "aws ecs list-tasks --cluster cloudlab-erik-retry-cluster --service-name cloudlab-erik-retry-service --query 'taskArns[0]' --output text"
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"

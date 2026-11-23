@@ -1,0 +1,9 @@
+aws_region     = "us-east-1"
+project_prefix = "cloudlab-erik"
+allowed_cidr   = "203.0.113.10/32"
+image_tag      = "v1"
+
+# Opcionales: reutilizar una VPC, subredes o cluster existentes.
+# vpc_id           = "vpc-..."
+# subnet_ids       = ["subnet-...", "subnet-..."]
+# ecs_cluster_name = "cloudlab-erik-cluster"

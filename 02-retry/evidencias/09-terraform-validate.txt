@@ -1,0 +1,10 @@
+# 09 - Validacion de la configuracion Terraform
+Fecha: 2026-11-22T20:07:02-05:00
+
+## terraform/ecr
+Success! The configuration is valid.
+
+
+## terraform/runtime
+Success! The configuration is valid.
+

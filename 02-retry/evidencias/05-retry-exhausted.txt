@@ -1,0 +1,120 @@
+# 05 - Agotamiento: tres intentos y error final controlado
+Fecha: 2026-11-22T20:04:19-05:00
+URL base: http://127.0.0.1:8092
+
+$ curl -sS "http://127.0.0.1:8092/request?scenario=permanent&run_id=demo-20261122-200416-permanent"
+HTTP 503
+{
+    "status": "failed",
+    "service": "retry-client",
+    "run_id": "demo-20261122-200416-permanent",
+    "scenario": "permanent",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": false,
+    "http_status": 503,
+    "waits": [
+        0.5,
+        1.0
+    ],
+    "total_elapsed": 1.533,
+    "attempt_details": [
+        {
+            "attempt": 1,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0084,
+            "timestamp": 1795395857.983596,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-permanent",
+                "scenario": "permanent",
+                "request_number": 1,
+                "http_status": 503,
+                "timestamp": 1795395857.9826727,
+                "message": "Fallo permanente simulado"
+            }
+        },
+        {
+            "attempt": 2,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0085,
+            "timestamp": 1795395858.4923456,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-permanent",
+                "scenario": "permanent",
+                "request_number": 2,
+                "http_status": 503,
+                "timestamp": 1795395858.4913778,
+                "message": "Fallo permanente simulado"
+            }
+        },
+        {
+            "attempt": 3,
+            "outcome": "retryable_error",
+            "http_status": 503,
+            "elapsed": 0.0157,
+            "timestamp": 1795395859.508332,
+            "error": "HTTP 503 del backend",
+            "retry_after": null,
+            "response_body": {
+                "status": "error",
+                "service": "retry-backend",
+                "run_id": "demo-20261122-200416-permanent",
+                "scenario": "permanent",
+                "request_number": 3,
+                "http_status": 503,
+                "timestamp": 1795395859.5072336,
+                "message": "Fallo permanente simulado"
+            }
+        }
+    ],
+    "backend_response": {
+        "status": "error",
+        "service": "retry-backend",
+        "run_id": "demo-20261122-200416-permanent",
+        "scenario": "permanent",
+        "request_number": 3,
+        "http_status": 503,
+        "timestamp": 1795395859.5072336,
+        "message": "Fallo permanente simulado"
+    },
+    "error": "HTTP 503 del backend"
+}
+
+$ curl -sS "http://127.0.0.1:8092/backend/stats?run_id=demo-20261122-200416-permanent"
+{
+    "run_id": "demo-20261122-200416-permanent",
+    "total_requests": 3,
+    "failed_requests": 3,
+    "successful_requests": 0,
+    "attempts": [
+        {
+            "attempt": 1,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795395857.9826713
+        },
+        {
+            "attempt": 2,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795395858.4913764
+        },
+        {
+            "attempt": 3,
+            "scenario": "permanent",
+            "status_code": 503,
+            "timestamp": 1795395859.507232
+        }
+    ],
+    "created_at": 1795395857.982668
+}

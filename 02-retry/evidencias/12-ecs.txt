@@ -1,0 +1,177 @@
+# 12 - Verificacion real de la ejecucion en Amazon ECS Fargate
+Fecha: 2026-11-22T20:19:19-05:00
+Region: us-east-1
+Nota: esta evidencia es la salida real de AWS CLI. El PNG se renderiza
+a partir de este texto; no es una captura de la consola de AWS.
+
+## aws sts get-caller-identity
+{
+    "UserId": "AROAXYKJVHWV5RYQ7XCQD:user5153321=ee15",
+    "Account": "533267299755",
+    "Arn": "arn:aws:sts::533267299755:assumed-role/voclabs/user5153321=ee15"
+}
+
+## aws ecs describe-services
+{
+    "serviceName": "cloudlab-erik-retry-service",
+    "status": "ACTIVE",
+    "launchType": "FARGATE",
+    "desiredCount": 1,
+    "runningCount": 1,
+    "pendingCount": 0,
+    "taskDefinition": "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry:1",
+    "createdAt": "2026-11-22T20:15:10.716000-05:00"
+}
+
+## aws ecs list-tasks
+{
+    "taskArns": [
+        "arn:aws:ecs:us-east-1:533267299755:task/cloudlab-erik-retry-cluster/c8bb4686b9574b89a56a84292691b921"
+    ]
+}
+
+## aws ecs describe-tasks
+{
+    "taskArn": "arn:aws:ecs:us-east-1:533267299755:task/cloudlab-erik-retry-cluster/c8bb4686b9574b89a56a84292691b921",
+    "lastStatus": "RUNNING",
+    "healthStatus": "HEALTHY",
+    "cpu": "512",
+    "memory": "1024",
+    "availabilityZone": "us-east-1c",
+    "startedAt": "2026-11-22T20:15:48.432000-05:00",
+    "containers": [
+        {
+            "name": "backend",
+            "lastStatus": "RUNNING",
+            "healthStatus": "HEALTHY",
+            "image": "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1",
+            "imageDigest": "sha256:ee787f82f12e23131376355f462c9f6fe9b66cc87da6edcbb9749172690e6e08"
+        },
+        {
+            "name": "client",
+            "lastStatus": "RUNNING",
+            "healthStatus": "HEALTHY",
+            "image": "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1",
+            "imageDigest": "sha256:543bf23ee74684fcb6bd88e6e5d479df42d943faf0cb652eefabbc4d2ce0e753"
+        }
+    ]
+}
+
+## aws ecs describe-task-definition
+{
+    "family": "cloudlab-erik-retry",
+    "revision": 1,
+    "cpu": "512",
+    "memory": "1024",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "executionRoleArn": "arn:aws:iam::533267299755:role/LabRole",
+    "taskRoleArn": "arn:aws:iam::533267299755:role/LabRole",
+    "containers": [
+        {
+            "name": "backend",
+            "image": "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1",
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 8001,
+                    "hostPort": 8001,
+                    "protocol": "tcp"
+                }
+            ]
+        },
+        {
+            "name": "client",
+            "image": "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1",
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp"
+                }
+            ]
+        }
+    ]
+}
+
+## aws ec2 describe-network-interfaces
+{
+    "networkInterfaceId": "eni-0b0c65829f2685013",
+    "privateIp": "172.31.22.234",
+    "publicIp": "13.218.98.224",
+    "subnetId": "subnet-04dab9ed2b71261a0",
+    "vpcId": "vpc-0bfdd39b2f8f6f14b",
+    "securityGroups": [
+        {
+            "name": "cloudlab-erik-retry-client-sg",
+            "id": "sg-00c8147afabb6ae12"
+        }
+    ]
+}
+
+## aws ecs describe-services events (ultimos 5)
+[
+    {
+        "createdAt": "2026-11-22T20:16:23.832000-05:00",
+        "message": "(service cloudlab-erik-retry-service) has reached a steady state."
+    },
+    {
+        "createdAt": "2026-11-22T20:16:23.831000-05:00",
+        "message": "(service cloudlab-erik-retry-service) (deployment ecs-svc/2113504347586729447) deployment completed."
+    },
+    {
+        "createdAt": "2026-11-22T20:15:24.596000-05:00",
+        "message": "(service cloudlab-erik-retry-service) has started 1 tasks: (task c8bb4686b9574b89a56a84292691b921)."
+    }
+]
+
+## Prueba HTTP real
+$ curl -sS http://13.218.98.224:8000/health
+{
+    "status": "ok",
+    "service": "retry-client",
+    "backend_url": "http://127.0.0.1:8001",
+    "retry_policy": {
+        "max_attempts": 3,
+        "retries": 2,
+        "initial_wait_seconds": 0.5,
+        "max_wait_seconds": 2.0,
+        "http_timeout_seconds": 2.0,
+        "strategy": "exponential_backoff",
+        "retry_on": [
+            429,
+            500,
+            502,
+            503,
+            504,
+            "timeout",
+            "connection_error"
+        ],
+        "no_retry_on": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            422
+        ]
+    },
+    "uptime_seconds": 249.845
+}
+
+$ curl -sS 'http://13.218.98.224:8000/request?scenario=transient&run_id=evidence-12'
+{
+    "status": "success",
+    "scenario": "transient",
+    "attempts": 3,
+    "retries": 2,
+    "recovered": true,
+    "http_status": 200,
+    "waits": [
+        0.5,
+        1.0
+    ]
+}

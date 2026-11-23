@@ -1,0 +1,453 @@
+# 11 - Apply de Terraform y publicacion de imagenes
+Fecha: 2026-11-22T20:16:23-05:00
+Region: us-east-1
+IP autorizada: 157.100.142.229/32
+
+## terraform/ecr
+aws_ecr_repository.this["backend"]: Creating...
+aws_ecr_repository.this["client"]: Creating...
+aws_ecr_repository.this["client"]: Creation complete after 1s [id=cloudlab-erik-retry-client]
+aws_ecr_repository.this["backend"]: Creation complete after 1s [id=cloudlab-erik-retry-backend]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+backend_repository_name = "cloudlab-erik-retry-backend"
+backend_repository_url = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend"
+client_repository_name = "cloudlab-erik-retry-client"
+client_repository_url = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client"
+image_tag = "v1"
+
+## Imagenes Docker
+$ docker build -t cloudlab-erik-retry-client:v1 ./client
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  51.71kB
+Step 1/8 : FROM python:3.12-slim
+ ---> 5e2bdb1b0d54
+Step 2/8 : ENV PYTHONDONTWRITEBYTECODE=1     PYTHONUNBUFFERED=1
+ ---> Using cache
+ ---> 3c682ab2d5a7
+Step 3/8 : WORKDIR /app
+ ---> Using cache
+ ---> 421a99abf3aa
+Step 4/8 : COPY requirements.txt .
+ ---> Using cache
+ ---> e7e3f661f0e5
+Step 5/8 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Using cache
+ ---> fbebf3272eb8
+Step 6/8 : COPY retry_policy.py main.py ./
+ ---> Using cache
+ ---> 1f2e0bdd08b6
+Step 7/8 : EXPOSE 8000
+ ---> Using cache
+ ---> d1c439c93683
+Step 8/8 : CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ ---> Using cache
+ ---> 543bf23ee746
+Successfully built 543bf23ee746
+Successfully tagged cloudlab-erik-retry-client:v1
+
+$ docker build -t cloudlab-erik-retry-backend:v1 ./backend
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  19.97kB
+Step 1/8 : FROM python:3.12-slim
+ ---> 5e2bdb1b0d54
+Step 2/8 : ENV PYTHONDONTWRITEBYTECODE=1     PYTHONUNBUFFERED=1
+ ---> Using cache
+ ---> 3c682ab2d5a7
+Step 3/8 : WORKDIR /app
+ ---> Using cache
+ ---> 421a99abf3aa
+Step 4/8 : COPY requirements.txt .
+ ---> Using cache
+ ---> c7bbbd9feebf
+Step 5/8 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Using cache
+ ---> ccb9600f3067
+Step 6/8 : COPY main.py .
+ ---> Using cache
+ ---> c3d8a888c3ad
+Step 7/8 : EXPOSE 8001
+ ---> Using cache
+ ---> 764bf7a190fe
+Step 8/8 : CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+ ---> Using cache
+ ---> ee787f82f12e
+Successfully built ee787f82f12e
+Successfully tagged cloudlab-erik-retry-backend:v1
+
+$ aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 533267299755.dkr.ecr.us-east-1.amazonaws.com
+
+WARNING! Your credentials are stored unencrypted in '/home/l4ta/.docker/config.json'.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/go/credential-store/
+
+Login Succeeded
+
+$ docker tag cloudlab-erik-retry-client:v1 533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1
+$ docker tag cloudlab-erik-retry-backend:v1 533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1
+
+$ docker push 533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1
+The push refers to repository [533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client]
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+e66e5b57ebe7: Waiting
+05e0eee5572e: Pushed
+9a4b752a0529: Waiting
+e66e5b57ebe7: Waiting
+e66e5b57ebe7: Waiting
+9a4b752a0529: Waiting
+68bced9e0afa: Pushed
+e66e5b57ebe7: Pushed
+be0e48cc2524: Waiting
+9cfa2da3df5a: Waiting
+be0e48cc2524: Waiting
+9cfa2da3df5a: Waiting
+9a4b752a0529: Pushed
+9cfa2da3df5a: Waiting
+2dc99d2d0a39: Pushed
+9cfa2da3df5a: Pushed
+37fb86c2a767: Pushed
+be0e48cc2524: Pushed
+v1: digest: sha256:543bf23ee74684fcb6bd88e6e5d479df42d943faf0cb652eefabbc4d2ce0e753 size: 2056
+
+$ docker push 533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1
+The push refers to repository [533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend]
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Waiting
+37fb86c2a767: Waiting
+2dc99d2d0a39: Waiting
+68bced9e0afa: Waiting
+05e0eee5572e: Pushed
+e66e5b57ebe7: Waiting
+85635be8e634: Waiting
+85635be8e634: Waiting
+e66e5b57ebe7: Waiting
+e66e5b57ebe7: Waiting
+85635be8e634: Waiting
+e66e5b57ebe7: Waiting
+85635be8e634: Waiting
+85635be8e634: Waiting
+4335df6b8154: Waiting
+68bced9e0afa: Pushed
+4335df6b8154: Waiting
+4335df6b8154: Waiting
+4335df6b8154: Waiting
+ce637a7c051c: Waiting
+e66e5b57ebe7: Pushed
+4335df6b8154: Waiting
+ce637a7c051c: Waiting
+85635be8e634: Pushed
+ce637a7c051c: Waiting
+2dc99d2d0a39: Pushed
+ce637a7c051c: Pushed
+37fb86c2a767: Pushed
+4335df6b8154: Pushed
+v1: digest: sha256:ee787f82f12e23131376355f462c9f6fe9b66cc87da6edcbb9749172690e6e08 size: 2056
+
+## terraform/runtime
+aws_cloudwatch_log_group.backend: Creating...
+aws_cloudwatch_log_group.client: Creating...
+aws_ecs_cluster.this[0]: Creating...
+aws_security_group.client: Creating...
+aws_cloudwatch_log_group.client: Creation complete after 1s [id=/ecs/cloudlab-erik-retry-client]
+aws_cloudwatch_log_group.backend: Creation complete after 1s [id=/ecs/cloudlab-erik-retry-backend]
+aws_ecs_task_definition.this: Creating...
+aws_ecs_task_definition.this: Creation complete after 0s [id=cloudlab-erik-retry]
+aws_security_group.client: Creation complete after 4s [id=sg-00c8147afabb6ae12]
+aws_ecs_cluster.this[0]: Still creating... [00m10s elapsed]
+aws_ecs_cluster.this[0]: Creation complete after 11s [id=arn:aws:ecs:us-east-1:533267299755:cluster/cloudlab-erik-retry-cluster]
+aws_ecs_service.this: Creating...
+aws_ecs_service.this: Creation complete after 1s [id=arn:aws:ecs:us-east-1:533267299755:service/cloudlab-erik-retry-cluster/cloudlab-erik-retry-service]
+
+Apply complete! Resources: 6 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+backend_image = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-backend:v1"
+backend_log_group = "/ecs/cloudlab-erik-retry-backend"
+client_image = "533267299755.dkr.ecr.us-east-1.amazonaws.com/cloudlab-erik-retry-client:v1"
+client_log_group = "/ecs/cloudlab-erik-retry-client"
+cluster_name = "cloudlab-erik-retry-cluster"
+security_group_id = "sg-00c8147afabb6ae12"
+service_name = "cloudlab-erik-retry-service"
+task_definition_arn = "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry:1"
+task_lookup_command = "aws ecs list-tasks --cluster cloudlab-erik-retry-cluster --service-name cloudlab-erik-retry-service --query 'taskArns[0]' --output text"
+
+## Verificacion ECS
+Cluster: cloudlab-erik-retry-cluster
+Servicio: cloudlab-erik-retry-service
+Tarea: arn:aws:ecs:us-east-1:533267299755:task/cloudlab-erik-retry-cluster/c8bb4686b9574b89a56a84292691b921
+IP publica: 13.218.98.224
+{
+    "status": "ACTIVE",
+    "desired": 1,
+    "running": 1,
+    "pending": 0,
+    "taskDefinition": "arn:aws:ecs:us-east-1:533267299755:task-definition/cloudlab-erik-retry:1"
+}
+{
+    "lastStatus": "RUNNING",
+    "healthStatus": "HEALTHY",
+    "containers": [
+        {
+            "name": "backend",
+            "lastStatus": "RUNNING",
+            "healthStatus": "HEALTHY"
+        },
+        {
+            "name": "client",
+            "lastStatus": "RUNNING",
+            "healthStatus": "HEALTHY"
+        }
+    ]
+}
